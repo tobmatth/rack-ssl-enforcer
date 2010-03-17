@@ -1,7 +1,7 @@
 require 'helper'
 
 class TestRackSslEnforcer < Test::Unit::TestCase
-  
+
   def dummy_app(env)
     [ 200, {'Content-Type' => 'text/plain'}, 'Hello world!' ]
   end
@@ -59,6 +59,5 @@ class TestRackSslEnforcer < Test::Unit::TestCase
         assert_equal response.body, @message
       end
     end
-  
-  end
+
 end
