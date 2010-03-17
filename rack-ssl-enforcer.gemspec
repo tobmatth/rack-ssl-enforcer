@@ -23,6 +23,7 @@ Gem::Specification.new do |s|
      "Rakefile",
      "VERSION",
      "lib/rack-ssl-enforcer.rb",
+     "rack-ssl-enforcer.gemspec",
      "test/helper.rb",
      "test/test_rack-ssl-enforcer.rb"
   ]
