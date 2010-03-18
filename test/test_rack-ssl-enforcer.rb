@@ -59,5 +59,7 @@ class TestRackSslEnforcer < Test::Unit::TestCase
         assert_equal response.body, @message
       end
     end
+    
+  end
 
 end
