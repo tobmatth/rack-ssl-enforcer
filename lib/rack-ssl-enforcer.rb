@@ -18,7 +18,7 @@ module Rack
     private
       
       def ssl_request?(env)
-        env['rack.url_scheme'] == 'https'
+        (env['HTTP_X_FORWARDED_PROTO'] || env['rack.url_scheme']) == 'https'
       end
  
   end
