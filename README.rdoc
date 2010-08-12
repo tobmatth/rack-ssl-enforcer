@@ -29,7 +29,7 @@ You might need the :redirect_to option if the requested URL can't be determined 
 == Contributors
 
 * {Dan Mayer}[http://github.com/danmayer]
-* {Rémy Coutable}http://github.com/rymai]
+* {Rémy Coutable}[http://github.com/rymai]
 
 == Copyright
 
