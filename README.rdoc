@@ -26,9 +26,10 @@ You might need the :redirect_to option if the requested URL can't be determined 
   (if you want to have your own version, that is fine but bump version in a commit by itself I can ignore when I pull)
 * Send me a pull request. Bonus points for topic branches.
 
-== Thanks!
+== Contributors
 
-* To {Dan Mayer}[http://github.com/danmayer] for making proxied ssl setups work
+* {Dan Mayer}[http://github.com/danmayer]
+* {Rémy Coutable}http://github.com/rymai]
 
 == Copyright
 
