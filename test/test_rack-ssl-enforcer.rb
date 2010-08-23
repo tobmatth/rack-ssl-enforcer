@@ -79,6 +79,66 @@ class TestRackSslEnforcer < Test::Unit::TestCase
       end
     end
     
+    context 'that has regex pattern' do
+      setup do
+        @request  = Rack::MockRequest.new(Rack::SslEnforcer.new(@app, /^\/admin\//))
+      end
+      
+      should 'respond with a ssl redirect for /admin path' do
+        response = @request.get('http://www.example.org/admin/', {})
+        assert_equal 301, response.status
+        assert_equal response.location, 'https://www.example.org/admin/'
+      end
+      
+      should 'respond not redirect ssl requests' do
+        response = @request.get('http://www.example.org/foo/', {})
+        assert_equal 200, response.status
+        assert_equal response.body, 'Hello world!'
+      end
+    end
+    
+    context 'that has path' do
+      setup do
+        @request  = Rack::MockRequest.new(Rack::SslEnforcer.new(@app, "/login"))
+      end
+      
+      should 'respond with a ssl redirect for /login path' do
+        response = @request.get('http://www.example.org/login/', {})
+        assert_equal 301, response.status
+        assert_equal response.location, 'https://www.example.org/login/'
+      end
+      
+      should 'respond not redirect ssl requests' do
+        response = @request.get('http://www.example.org/foo/', {})
+        assert_equal 200, response.status
+        assert_equal response.body, 'Hello world!'
+      end
+    end
+    
+    context 'that has array of regex pattern & path' do
+      setup do
+        @request  = Rack::MockRequest.new(Rack::SslEnforcer.new(@app, [/\.xml$/, "/login"]))
+      end
+      
+      should 'respond with a ssl redirect for /login path' do
+        response = @request.get('http://www.example.org/login/', {})
+        assert_equal 301, response.status
+        assert_equal response.location, 'https://www.example.org/login/'
+      end
+      
+      should 'respond with a ssl redirect for /admin path' do
+        response = @request.get('http://www.example.org/users.xml', {})
+        assert_equal 301, response.status
+        assert_equal response.location, 'https://www.example.org/users.xml'
+      end
+      
+      should 'respond not redirect ssl requests' do
+        response = @request.get('http://www.example.org/foo/', {})
+        assert_equal 200, response.status
+        assert_equal response.body, 'Hello world!'
+      end
+    end
+    
   end
 
 end

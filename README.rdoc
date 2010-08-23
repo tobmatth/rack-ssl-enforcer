@@ -15,6 +15,12 @@ This will redirect all plain-text requests to SSL. Rack::SslEnforcer accepts two
 You might need the :redirect_to option if the requested URL can't be determined (e.g. if using a proxy).
 
   use Rack::SslEnforcer, :redirect_to => 'https://example.org', :message => 'R-R-R-Redirecting...'
+  
+You can also define specifics regex pattern or path to redirect.
+  
+  use Rack::SslEnforcer, /^\/admin\//
+  use Rack::SslEnforcer, "/login"
+  use Rack::SslEnforcer, ["/login", /\.xml$/]
 
 == Note on Patches/Pull Requests
  
