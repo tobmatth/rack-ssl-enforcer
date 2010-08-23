@@ -1,5 +1,4 @@
 module Rack
-  
   class SslEnforcer
     
     def initialize(app, *args)
@@ -25,26 +24,26 @@ module Rack
       end
     end
     
-    private
-      
-      def ssl_request?(env)
-        (env['HTTP_X_FORWARDED_PROTO'] || env['rack.url_scheme']) == 'https'
-      end
-      
-      def enforce_ssl?(env)
-        path = env['PATH_INFO']
-        if @rules
-          @rules.any? do |pattern|
-            if pattern.is_a?(Regexp)
-              path =~ pattern
-            else
-              path[0,pattern.length] == pattern
-            end
+  private
+    
+    def ssl_request?(env)
+      (env['HTTP_X_FORWARDED_PROTO'] || env['rack.url_scheme']) == 'https'
+    end
+    
+    def enforce_ssl?(env)
+      path = env['PATH_INFO']
+      if @rules
+        @rules.any? do |pattern|
+          if pattern.is_a?(Regexp)
+            path =~ pattern
+          else
+            path[0,pattern.length] == pattern
           end
-        else
-          true
         end
+      else
+        true
       end
-      
+    end
+    
   end
 end
