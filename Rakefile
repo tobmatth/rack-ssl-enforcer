@@ -1,21 +1,5 @@
-require 'rubygems'
-require 'rake'
-
-begin
-  require 'jeweler'
-  Jeweler::Tasks.new do |gem|
-    gem.name = "rack-ssl-enforcer"
-    gem.summary = %Q{A simple Rack middleware to enforce SSL}
-    gem.email = "tm@mit2m.de"
-    gem.homepage = "http://github.com/tobmatth/rack-ssl-enforcer"
-    gem.authors = ["Tobias Matthies"]
-    gem.add_development_dependency "thoughtbot-shoulda", ">= 0"
-    # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
-  end
-  Jeweler::GemcutterTasks.new
-rescue LoadError
-  puts "Jeweler (or a dependency) not available. Install it with: gem install jeweler"
-end
+require 'bundler'
+Bundler::GemHelper.install_tasks
 
 require 'rake/testtask'
 Rake::TestTask.new(:test) do |test|
@@ -37,14 +21,13 @@ rescue LoadError
   end
 end
 
-task :test => :check_dependencies
-
 task :default => :test
 
 require 'rake/rdoctask'
+require 'rack-ssl-enforcer/version'
 Rake::RDocTask.new do |rdoc|
-  version = File.exist?('VERSION') ? File.read('VERSION') : ""
-
+  version = Rack::SslEnforcer::VERSION
+  
   rdoc.rdoc_dir = 'rdoc'
   rdoc.title = "rack-ssl-enforcer #{version}"
   rdoc.rdoc_files.include('README*')
