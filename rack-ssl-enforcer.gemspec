@@ -15,7 +15,6 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = ">= 1.3.6"
   s.rubyforge_project         = "rack-ssl-enforcer"
   
-  s.add_dependency "rack"
   s.add_development_dependency "bundler", ">= 1.0.0.rc.5"
   s.add_development_dependency "shoulda", "~> 2.11.3"
   
