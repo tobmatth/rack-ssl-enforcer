@@ -79,9 +79,9 @@ class TestRackSslEnforcer < Test::Unit::TestCase
       end
     end
     
-    context 'that has regex pattern' do
+    context 'that has regex pattern as only option' do
       setup do
-        @request  = Rack::MockRequest.new(Rack::SslEnforcer.new(@app, /^\/admin\//))
+        @request  = Rack::MockRequest.new(Rack::SslEnforcer.new(@app, :only => /^\/admin\//))
       end
       
       should 'respond with a ssl redirect for /admin path' do
@@ -97,9 +97,9 @@ class TestRackSslEnforcer < Test::Unit::TestCase
       end
     end
     
-    context 'that has path' do
+    context 'that has path as only option' do
       setup do
-        @request  = Rack::MockRequest.new(Rack::SslEnforcer.new(@app, "/login"))
+        @request  = Rack::MockRequest.new(Rack::SslEnforcer.new(@app, :only => "/login"))
       end
       
       should 'respond with a ssl redirect for /login path' do
@@ -115,9 +115,9 @@ class TestRackSslEnforcer < Test::Unit::TestCase
       end
     end
     
-    context 'that has array of regex pattern & path' do
+    context 'that has array of regex pattern & path as only option' do
       setup do
-        @request  = Rack::MockRequest.new(Rack::SslEnforcer.new(@app, [/\.xml$/, "/login"]))
+        @request  = Rack::MockRequest.new(Rack::SslEnforcer.new(@app, :only => [/\.xml$/, "/login"]))
       end
       
       should 'respond with a ssl redirect for /login path' do
@@ -139,6 +139,17 @@ class TestRackSslEnforcer < Test::Unit::TestCase
       end
     end
     
+    context 'that has array of regex pattern & path as only option with strict option' do
+      setup do
+        @request  = Rack::MockRequest.new(Rack::SslEnforcer.new(@app, :only => [/\.xml$/, "/login"], :strict => true))
+      end
+      
+      should 'respond with a http redirect from non-allowed https url' do
+        response = @request.get('https://www.example.org/foo/', {})
+        assert_equal 301, response.status
+        assert_equal response.location, 'http://www.example.org/foo/'
+      end
+    end
   end
 
 end

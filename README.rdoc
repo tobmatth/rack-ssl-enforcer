@@ -18,9 +18,13 @@ You might need the :redirect_to option if the requested URL can't be determined 
   
 You can also define specifics regex pattern or path to redirect.
   
-  use Rack::SslEnforcer, /^\/admin\//
-  use Rack::SslEnforcer, "/login"
-  use Rack::SslEnforcer, ["/login", /\.xml$/]
+  use Rack::SslEnforcer, :only => /^\/admin\//
+  use Rack::SslEnforcer, :only => "/login"
+  use Rack::SslEnforcer, :only => ["/login", /\.xml$/]
+  
+And force http for non-https path
+
+  use Rack::SslEnforcer, :only => ["/login", /\.xml$/], :strict => true
 
 == Note on Patches/Pull Requests
  
