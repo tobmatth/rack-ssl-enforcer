@@ -149,6 +149,12 @@ class TestRackSslEnforcer < Test::Unit::TestCase
         assert_equal 301, response.status
         assert_equal response.location, 'http://www.example.org/foo/'
       end
+      
+      should 'respond with a http redirect from non-allowed https url' do
+        response = @request.get('https://www.example.org/login', {})
+        assert_equal 200, response.status
+        assert_equal response.body, 'Hello world!'
+      end
     end
   end
 

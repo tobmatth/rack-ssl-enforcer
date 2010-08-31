@@ -6,8 +6,8 @@ module Rack
     end
     
     def call(env)
-      if enforce_ssl?(env) && !ssl_request?(env)
-        scheme = 'https'
+      if enforce_ssl?(env)
+        scheme = 'https' unless ssl_request?(env)
       elsif ssl_request?(env) && @options[:strict]
         scheme = 'http'
       end
