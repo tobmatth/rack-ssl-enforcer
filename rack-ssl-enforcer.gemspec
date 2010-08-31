@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
   s.email       = ["tm@mit2m.de"]
   s.homepage    = "http://github.com/tobmatth/rack-ssl-enforcer"
   s.summary     = "A simple Rack middleware to enforce SSL"
-  s.description = "Write a gem description!"
+  s.description = "Rack::SslEnforcer is a simple Rack middleware to enforce ssl connections"
   
   s.required_rubygems_version = ">= 1.3.6"
   s.rubyforge_project         = "rack-ssl-enforcer"
