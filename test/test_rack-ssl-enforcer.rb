@@ -3,7 +3,7 @@ require 'helper'
 class TestRackSslEnforcer < Test::Unit::TestCase
 
   def dummy_app(env)
-    [ 200, {'Content-Type' => 'text/plain'}, 'Hello world!' ]
+    [200, {'Content-Type' => 'text/plain'}, ['Hello world!']]
   end
 
   context 'Given an app' do
@@ -150,7 +150,7 @@ class TestRackSslEnforcer < Test::Unit::TestCase
         assert_equal response.location, 'http://www.example.org/foo/'
       end
       
-      should 'respond with a http redirect from non-allowed https url' do
+      should 'respond from allowed https url' do
         response = @request.get('https://www.example.org/login', {})
         assert_equal 200, response.status
         assert_equal response.body, 'Hello world!'

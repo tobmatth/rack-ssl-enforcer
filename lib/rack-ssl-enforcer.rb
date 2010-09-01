@@ -16,7 +16,7 @@ module Rack
         @options[:redirect_to] ||= Rack::Request.new(env).url
         @options[:redirect_to].gsub!(/^#{scheme == "https" ? 'http' : 'https'}:/, "#{scheme}:")
         @options[:message] ||= "You are being redirected to #{@options[:redirect_to]}."
-        [301, { 'Location' => @options[:redirect_to] }, @options[:message]]
+        [301, { 'Location' => @options[:redirect_to] }, [@options[:message]].flatten]
       else
         @app.call(env)
       end
