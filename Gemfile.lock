@@ -1,8 +1,7 @@
 PATH
   remote: .
   specs:
-    rack-ssl-enforcer (0.1.4)
-      rack
+    rack-ssl-enforcer (0.1.6)
 
 GEM
   remote: http://rubygems.org/
@@ -14,7 +13,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  bundler (>= 1.0.0.rc.5)
-  rack
+  bundler (>= 1.0.0)
+  rack (~> 1.2.0)
   rack-ssl-enforcer!
   shoulda (~> 2.11.3)
