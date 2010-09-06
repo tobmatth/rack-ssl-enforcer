@@ -41,6 +41,7 @@ And force http for non-https path
 
 * {Dan Mayer}[http://github.com/danmayer]
 * {Rémy Coutable}[http://github.com/rymai]
+* {Thibaud Guillaume-Gentil}[http://github.com/thibaudgg]
 
 == Copyright
 
