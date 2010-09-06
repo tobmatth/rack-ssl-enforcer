@@ -11,10 +11,10 @@ Rack::SslEnforcer is a simple Rack middleware to enforce ssl connections
   require 'rack-ssl-enforcer'
   use Rack::SslEnforcer
 
-This will redirect all plain-text requests to SSL. Rack::SslEnforcer accepts two params, :redirect_to and :message.
+This will redirect all plain-text requests to SSL. Rack::SslEnforcer accepts params, :redirect_to.
 You might need the :redirect_to option if the requested URL can't be determined (e.g. if using a proxy).
 
-  use Rack::SslEnforcer, :redirect_to => 'https://example.org', :message => 'R-R-R-Redirecting...'
+  use Rack::SslEnforcer, :redirect_to => 'https://example.org'
   
 You can also define specifics regex pattern or path to redirect.
   
