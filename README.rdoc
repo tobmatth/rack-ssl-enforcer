@@ -4,14 +4,15 @@ Rack::SslEnforcer is a simple Rack middleware to enforce ssl connections
 
 == Installation
 
-  sudo gem install rack-ssl-enforcer -s http://gemcutter.org
+  gem install rack-ssl-enforcer
 
 == Usage
 
   require 'rack-ssl-enforcer'
   use Rack::SslEnforcer
 
-This will redirect all plain-text requests to SSL. Rack::SslEnforcer accepts params, :redirect_to.
+This will redirect all requests to SSL. Rack::SslEnforcer accepts params:
+
 You might need the :redirect_to option if the requested URL can't be determined (e.g. if using a proxy).
 
   use Rack::SslEnforcer, :redirect_to => 'https://example.org'
