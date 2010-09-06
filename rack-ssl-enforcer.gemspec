@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 $LOAD_PATH.unshift File.expand_path('../lib', __FILE__)
-require 'rack-ssl-enforcer/version'
+require 'rack/ssl-enforcer/version'
 
 Gem::Specification.new do |s|
   s.name        = "rack-ssl-enforcer"
