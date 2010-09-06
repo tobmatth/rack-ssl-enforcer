@@ -14,14 +14,14 @@ module Rack
       end
       
       if scheme
-        @options[:redirect_to] ||= "#{scheme}://#{@req.host}#{@req.path}"
+        location = @options[:redirect_to] || "#{scheme}://#{@req.host}#{@req.path}"
         [
           301,
           { 
             'Content-Type'  => 'text/html',
-            'Location'      => @options[:redirect_to]
+            'Location'      => location
           },
-          ["<html><body>#{Time.now} - #{scheme}://#{@req.host}#{@req.path} - #{env['PATH_INFO']} - #{@req.path} You are being redirected to #{@options[:redirect_to]}.</body></html>"]
+          ["<html><body>#{Time.now} - #{scheme}://#{@req.host}#{@req.path} - #{env['PATH_INFO']} - #{@req.path} You are being redirected to #{location}.</body></html>"]
         ]
       else
         @app.call(env)
