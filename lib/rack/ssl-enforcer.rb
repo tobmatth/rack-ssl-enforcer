@@ -19,10 +19,9 @@ module Rack
           301,
           { 
             'Content-Type'  => 'text/html',
-            'Cache-Control' => 'no-cache',
             'Location'      => @options[:redirect_to]
           },
-          ["<html><body>#{Time.now} - #{env['PATH_INFO']} - #{@req.path} You are being redirected to #{@options[:redirect_to]}.</body></html>"]
+          ["<html><body>#{Time.now} - #{scheme}://#{@req.host}#{@req.path} - #{env['PATH_INFO']} - #{@req.path} You are being redirected to #{@options[:redirect_to]}.</body></html>"]
         ]
       else
         @app.call(env)
