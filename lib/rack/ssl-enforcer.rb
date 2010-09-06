@@ -15,14 +15,8 @@ module Rack
       
       if scheme
         location = @options[:redirect_to] || "#{scheme}://#{@req.host}#{@req.path}"
-        [
-          301,
-          { 
-            'Content-Type'  => 'text/html',
-            'Location'      => location
-          },
-          ["<html><body>#{Time.now} - #{scheme}://#{@req.host}#{@req.path} - #{env['PATH_INFO']} - #{@req.path} You are being redirected to #{location}.</body></html>"]
-        ]
+        body     = "<html><body>You are being <a href=\"#{location}\">redirected</a>.</body></html>"
+        [301, { 'Content-Type' => 'text/html', 'Location' => location }, [body]]
       else
         @app.call(env)
       end
