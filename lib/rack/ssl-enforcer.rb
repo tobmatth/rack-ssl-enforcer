@@ -15,15 +15,14 @@ module Rack
       
       if scheme
         @options[:redirect_to] ||= "#{scheme}://#{@req.host}#{@req.path}"
-        @options[:message] ||= "#{Time.now} - #{env['PATH_INFO']} - #{@req.path} You are being redirected to #{@options[:redirect_to]}."
         [
-          307,
+          301,
           { 
-            'Content-Type'  => 'text/plain',
+            'Content-Type'  => 'text/html',
             'Cache-Control' => 'no-cache',
             'Location'      => @options[:redirect_to]
           },
-          [@options[:message]].flatten
+          ["<html><body>#{Time.now} - #{env['PATH_INFO']} - #{@req.path} You are being redirected to #{@options[:redirect_to]}.</body></html>"]
         ]
       else
         @app.call(env)

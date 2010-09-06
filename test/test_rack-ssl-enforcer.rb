@@ -7,7 +7,7 @@ class TestRackSslEnforcer < Test::Unit::TestCase
     
     should 'respond with a ssl redirect to plain-text requests' do
       get 'http://www.example.org/'
-      assert_equal 307, last_response.status
+      assert_equal 301, last_response.status
       assert_equal 'https://www.example.org/', last_response.location
     end
     
@@ -15,7 +15,7 @@ class TestRackSslEnforcer < Test::Unit::TestCase
     #http://github.com/pivotal/refraction/issues/issue/2
     should 'respect X-Forwarded-Proto header for proxied SSL' do
       get 'http://www.example.org/', {}, { 'HTTP_X_FORWARDED_PROTO' => 'http', 'rack.url_scheme' => 'http' }
-      assert_equal 307, last_response.status
+      assert_equal 301, last_response.status
       assert_equal 'https://www.example.org/', last_response.location
     end
     
@@ -37,7 +37,7 @@ class TestRackSslEnforcer < Test::Unit::TestCase
     
     should 'respond with a ssl redirect to plain-text requests and redirect to :redirect_to' do
       get 'http://www.example.org/'
-      assert_equal 307, last_response.status
+      assert_equal 301, last_response.status
       assert_equal 'https://www.google.com', last_response.location
     end
     
@@ -48,22 +48,12 @@ class TestRackSslEnforcer < Test::Unit::TestCase
     end
   end
   
-  context 'that has :message set' do
-    setup { mock_app :message => 'R-R-R-Redirect!' }
-    
-    should 'output the given message when redirecting' do
-      get 'http://www.example.org/'
-      assert_equal 307, last_response.status
-      assert_equal 'R-R-R-Redirect!', last_response.body
-    end
-  end
-  
   context 'that has regex pattern as only option' do
     setup { mock_app :only => /^\/admin/ }
     
     should 'respond with a ssl redirect for /admin path' do
       get 'http://www.example.org/admin'
-      assert_equal 307, last_response.status
+      assert_equal 301, last_response.status
       assert_equal 'https://www.example.org/admin', last_response.location
     end
     
@@ -79,7 +69,7 @@ class TestRackSslEnforcer < Test::Unit::TestCase
     
     should 'respond with a ssl redirect for /login path' do
       get 'http://www.example.org/login'
-      assert_equal 307, last_response.status
+      assert_equal 301, last_response.status
       assert_equal 'https://www.example.org/login', last_response.location
     end
     
@@ -95,13 +85,13 @@ class TestRackSslEnforcer < Test::Unit::TestCase
     
     should 'respond with a ssl redirect for /login path' do
       get 'http://www.example.org/login'
-      assert_equal 307, last_response.status
+      assert_equal 301, last_response.status
       assert_equal 'https://www.example.org/login', last_response.location
     end
     
     should 'respond with a ssl redirect for /admin path' do
       get 'http://www.example.org/users.xml'
-      assert_equal 307, last_response.status
+      assert_equal 301, last_response.status
       assert_equal 'https://www.example.org/users.xml', last_response.location
     end
     
@@ -117,7 +107,7 @@ class TestRackSslEnforcer < Test::Unit::TestCase
     
     should 'respond with a http redirect from non-allowed https url' do
       get 'https://www.example.org/foo/'
-      assert_equal 307, last_response.status
+      assert_equal 301, last_response.status
       assert_equal 'http://www.example.org/foo/', last_response.location
     end
     
