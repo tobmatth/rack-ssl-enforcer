@@ -14,7 +14,7 @@ module Rack
       end
       
       if scheme
-        location = @options[:redirect_to] || "#{scheme}://#{@req.host}#{@req.path}"
+        location = @options[:redirect_to] || @req.url.gsub(/^https?/, scheme)
         body     = "<html><body>You are being <a href=\"#{location}\">redirected</a>.</body></html>"
         [301, { 'Content-Type' => 'text/html', 'Location' => location }, [body]]
       else
