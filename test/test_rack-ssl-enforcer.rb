@@ -11,6 +11,12 @@ class TestRackSslEnforcer < Test::Unit::TestCase
       assert_equal 'https://www.example.org/', last_response.location
     end
     
+    should 'respond with a ssl redirect to plain-text requests and keep params' do
+      get 'http://www.example.org/admin?token=33'
+      assert_equal 301, last_response.status
+      assert_equal 'https://www.example.org/admin?token=33', last_response.location
+    end
+    
     #heroku / etc do proxied SSL
     #http://github.com/pivotal/refraction/issues/issue/2
     should 'respect X-Forwarded-Proto header for proxied SSL' do
