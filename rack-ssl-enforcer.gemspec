@@ -6,8 +6,8 @@ Gem::Specification.new do |s|
   s.name        = "rack-ssl-enforcer"
   s.version     = Rack::SslEnforcer::VERSION
   s.platform    = Gem::Platform::RUBY
-  s.authors     = ["Tobias Matthies"]
-  s.email       = ["tm@mit2m.de"]
+  s.authors     = ["Tobias Matthies", "Thibaud Guillaume-Gentil"]
+  s.email       = ["tm@mit2m.de", "thibaud@thibaud.me"]
   s.homepage    = "http://github.com/tobmatth/rack-ssl-enforcer"
   s.summary     = "A simple Rack middleware to enforce SSL"
   s.description = "Rack::SslEnforcer is a simple Rack middleware to enforce ssl connections"
