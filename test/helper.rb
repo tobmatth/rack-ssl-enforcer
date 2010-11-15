@@ -16,7 +16,9 @@ class Test::Unit::TestCase
   def mock_app(options = {})
     main_app = lambda { |env|
       request = Rack::Request.new(env)
-      [200, { 'Content-Type' => 'text/plain' }, ['Hello world!']]
+      headers = {'Content-Type' => "text/html"}
+      headers['Set-Cookie'] = "id=1; path=/\ntoken=abc; path=/; secure; HttpOnly"
+      [200, headers, ['Hello world!']]
     }
     
     builder = Rack::Builder.new
