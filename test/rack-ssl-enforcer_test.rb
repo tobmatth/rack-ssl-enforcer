@@ -36,6 +36,11 @@ class TestRackSslEnforcer < Test::Unit::TestCase
       assert_equal 200, last_response.status
       assert_equal 'Hello world!', last_response.body
     end
+    
+    should 'secure cookies' do
+      get 'https://www.example.org/'
+      assert_equal ["id=1; path=/; secure", "token=abc; path=/; secure; HttpOnly"], last_response.headers['Set-Cookie'].split("\n")
+    end
   end
   
   context 'that has :redirect_to set' do
@@ -67,6 +72,11 @@ class TestRackSslEnforcer < Test::Unit::TestCase
       get 'http://www.example.org/foo'
       assert_equal 200, last_response.status
       assert_equal 'Hello world!', last_response.body
+    end
+    
+    should 'secure cookies' do
+      get 'https://www.example.org/'
+      assert_equal ["id=1; path=/; secure", "token=abc; path=/; secure; HttpOnly"], last_response.headers['Set-Cookie'].split("\n")
     end
   end
   
@@ -121,6 +131,16 @@ class TestRackSslEnforcer < Test::Unit::TestCase
       get 'https://www.example.org/login'
       assert_equal 200, last_response.status
       assert_equal 'Hello world!', last_response.body
+    end
+    
+    should 'secure cookies' do
+      get 'https://www.example.org/login'
+      assert_equal ["id=1; path=/; secure", "token=abc; path=/; secure; HttpOnly"], last_response.headers['Set-Cookie'].split("\n")
+    end
+    
+    should 'not secure cookies' do
+      get 'http://www.example.org/'
+      assert_equal ["id=1; path=/", "token=abc; path=/; secure; HttpOnly"], last_response.headers['Set-Cookie'].split("\n")
     end
   end
   
