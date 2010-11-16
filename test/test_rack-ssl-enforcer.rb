@@ -36,6 +36,12 @@ class TestRackSslEnforcer < Test::Unit::TestCase
       assert_equal 200, last_response.status
       assert_equal 'Hello world!', last_response.body
     end
+    
+    should 'use default https port when redirecting non-standard http port to ssl' do
+      get 'http://example.org:81/', {}, { 'rack.url_scheme' => 'http' }
+      assert_equal 301, last_response.status
+      assert_equal 'https://example.org/', last_response.location
+    end
   end
   
   context 'that has :redirect_to set' do
@@ -121,6 +127,12 @@ class TestRackSslEnforcer < Test::Unit::TestCase
       get 'https://www.example.org/login'
       assert_equal 200, last_response.status
       assert_equal 'Hello world!', last_response.body
+    end
+    
+    should 'use default https port when redirecting non-standard ssl port to http' do
+      get 'https://example.org:81/', {}, { 'rack.url_scheme' => 'https' }
+      assert_equal 301, last_response.status
+      assert_equal 'http://example.org/', last_response.location
     end
   end
   
