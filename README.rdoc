@@ -2,9 +2,11 @@
 
 Rack::SslEnforcer is a simple Rack middleware to enforce ssl connections
 
+
 == Installation
 
   gem install rack-ssl-enforcer
+
 
 == Usage
 
@@ -17,7 +19,7 @@ You might need the :redirect_to option if the requested URL can't be determined 
 
   use Rack::SslEnforcer, :redirect_to => 'https://example.org'
   
-You can also define specifics regex pattern or path to redirect.
+You can also define specific regex patterns or paths to redirect.
   
   use Rack::SslEnforcer, :only => /^\/admin\//
   use Rack::SslEnforcer, :only => "/login"
@@ -26,6 +28,26 @@ You can also define specifics regex pattern or path to redirect.
 And force http for non-https path
 
   use Rack::SslEnforcer, :only => ["/login", /\.xml$/], :strict => true
+
+
+== TODO
+
+* Add HSTS support, see http://en.wikipedia.org/wiki/Strict_Transport_Security
+* Add configuration option to specify local http / https ports
+
+
+== Contributors
+
+* {Dan Mayer}[http://github.com/danmayer]
+* {Rémy Coutable}[http://github.com/rymai]
+* {Thibaud Guillaume-Gentil}[http://github.com/thibaudgg]
+* {Paul Annesley}[https://github.com/pda]
+
+
+== Credits
+
+Flagging cookies as secure functionality is greatly inspired by {Joshua Peek's Rack::SSL}[https://github.com/josh/rack-ssl]
+
 
 == Note on Patches/Pull Requests
  
@@ -37,11 +59,6 @@ And force http for non-https path
   (if you want to have your own version, that is fine but bump version in a commit by itself I can ignore when I pull)
 * Send me a pull request. Bonus points for topic branches.
 
-== Contributors
-
-* {Dan Mayer}[http://github.com/danmayer]
-* {Rémy Coutable}[http://github.com/rymai]
-* {Thibaud Guillaume-Gentil}[http://github.com/thibaudgg]
 
 == Copyright
 
