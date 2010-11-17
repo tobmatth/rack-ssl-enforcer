@@ -20,11 +20,13 @@ module Rack
       elsif ssl_request?(env)
         status, headers, body = @app.call(env)
         flag_cookies_as_secure!(headers)
+        set_hsts_headers!(headers)
         [status, headers, body]
       else
         @app.call(env)
       end
     end
+    
     
   private
     
@@ -69,6 +71,7 @@ module Rack
       scheme == 'https' ? 443 : 80
     end
 
+    # see http://en.wikipedia.org/wiki/HTTP_cookie#Cookie_hijacking
     def flag_cookies_as_secure!(headers)
       if cookies = headers['Set-Cookie']
         headers['Set-Cookie'] = cookies.split("\n").map { |cookie|
@@ -79,6 +82,14 @@ module Rack
           end
         }.join("\n")
       end
+    end
+    
+    # see http://en.wikipedia.org/wiki/Strict_Transport_Security
+    def set_hsts_headers!(headers)
+      opts = { :expires => 31536000, :subdomains => true }.merge(@options[:hsts] || {})
+      value  = "max-age=#{opts[:expires]}"
+      value += "; includeSubDomains" if opts[:subdomains]
+      headers.merge!({ 'Strict-Transport-Security' => value })
     end
     
   end
