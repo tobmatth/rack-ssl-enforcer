@@ -1,6 +1,7 @@
-= rack-ssl-enforcer
+= Rack::SslEnforcer
 
-Rack::SslEnforcer is a simple Rack middleware to enforce ssl connections
+Rack::SslEnforcer is a simple Rack middleware to enforce ssl connections. As of Version 0.2.0, Rack::SslEnforcer marks
+Cookies as secure and enables HSTS by default.
 
 
 == Installation
@@ -29,11 +30,15 @@ And force http for non-https path
 
   use Rack::SslEnforcer, :only => ["/login", /\.xml$/], :strict => true
 
+To set HSTS expiry and subdomain inclusion (defaults: one year, true)
+
+	use Rack::SslEnforcer, :hsts => {:expires => 500, :subdomains => false}
+
 
 == TODO
 
-* Add HSTS support, see http://en.wikipedia.org/wiki/Strict_Transport_Security
 * Add configuration option to specify local http / https ports
+* Cleanup tests
 
 
 == Contributors
@@ -56,7 +61,8 @@ Flagging cookies as secure functionality is greatly inspired by {Joshua Peek's R
 * Add tests for it. This is important so I don't break it in a
   future version unintentionally.
 * Commit, do not mess with rakefile, version, or history.
-  (if you want to have your own version, that is fine but bump version in a commit by itself I can ignore when I pull)
+  (if you want to have your own version, 
+  that is fine but bump version in a commit by itself I can ignore when I pull)
 * Send me a pull request. Bonus points for topic branches.
 
 
