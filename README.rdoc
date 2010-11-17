@@ -32,7 +32,7 @@ And force http for non-https path
 
 To set HSTS expiry and subdomain inclusion (defaults: one year, true)
 
-	use Rack::SslEnforcer, :hsts => {:expires => 500, :subdomains => false}
+  use Rack::SslEnforcer, :hsts => {:expires => 500, :subdomains => false}
 
 
 == TODO
