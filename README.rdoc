@@ -11,28 +11,37 @@ Cookies as secure and enables HSTS by default.
 
 == Usage
 
-  require 'rack-ssl-enforcer'
+  require 'rack/ssl-enforcer'
   use Rack::SslEnforcer
+  
+Or, if you are using Bundler, just add this to your Gemfile:
+
+  gem 'rack-ssl-enforcer', :require => 'rack/ssl-enforcer'
+
+To use Rack::SslEnforcer in your Rails application, add the following line to your application
+config file (config/application.rb for Rails3, config/environment.rb for Rails2):
+
+  config.middleware.use Rack::SslEnforcer
 
 This will redirect all requests to SSL. Rack::SslEnforcer accepts params:
 
 You might need the :redirect_to option if the requested URL can't be determined (e.g. if using a proxy).
 
-  use Rack::SslEnforcer, :redirect_to => 'https://example.org'
+  config.middleware.use Rack::SslEnforcer, :redirect_to => 'https://example.org'
   
 You can also define specific regex patterns or paths to redirect.
   
-  use Rack::SslEnforcer, :only => /^\/admin\//
-  use Rack::SslEnforcer, :only => "/login"
-  use Rack::SslEnforcer, :only => ["/login", /\.xml$/]
+  config.middleware.use Rack::SslEnforcer, :only => /^\/admin\//
+  config.middleware.use Rack::SslEnforcer, :only => "/login"
+  config.middleware.use Rack::SslEnforcer, :only => ["/login", /\.xml$/]
   
 And force http for non-https path
 
-  use Rack::SslEnforcer, :only => ["/login", /\.xml$/], :strict => true
+  config.middleware.use Rack::SslEnforcer, :only => ["/login", /\.xml$/], :strict => true
 
 To set HSTS expiry and subdomain inclusion (defaults: one year, true)
 
-  use Rack::SslEnforcer, :hsts => {:expires => 500, :subdomains => false}
+  config.middleware.use Rack::SslEnforcer, :hsts => {:expires => 500, :subdomains => false}
 
 
 == TODO
@@ -51,7 +60,7 @@ To set HSTS expiry and subdomain inclusion (defaults: one year, true)
 
 == Credits
 
-Flagging cookies as secure functionality is greatly inspired by {Joshua Peek's Rack::SSL}[https://github.com/josh/rack-ssl]
+Flagging cookies as secure functionality and HSTS support is greatly inspired by {Joshua Peek's Rack::SSL}[https://github.com/josh/rack-ssl]
 
 
 == Note on Patches/Pull Requests
