@@ -9,7 +9,7 @@ Cookies as secure and enables HSTS by default.
   gem install rack-ssl-enforcer
 
 
-== Usage
+== Basic Usage
 
   require 'rack/ssl-enforcer'
   use Rack::SslEnforcer
@@ -23,7 +23,10 @@ config file (config/application.rb for Rails3, config/environment.rb for Rails2)
 
   config.middleware.use Rack::SslEnforcer
 
-This will redirect all requests to SSL. Rack::SslEnforcer accepts params:
+If all you want is SSL for your whole application, you are done! However, you can specify some
+
+
+== Options
 
 You might need the :redirect_to option if the requested URL can't be determined (e.g. if using a proxy).
 
@@ -35,7 +38,7 @@ You can also define specific regex patterns or paths to redirect.
   config.middleware.use Rack::SslEnforcer, :only => "/login"
   config.middleware.use Rack::SslEnforcer, :only => ["/login", /\.xml$/]
   
-And force http for non-https path
+Use the :strict option to force http for all requests not matching your :only specification
 
   config.middleware.use Rack::SslEnforcer, :only => ["/login", /\.xml$/], :strict => true
 
