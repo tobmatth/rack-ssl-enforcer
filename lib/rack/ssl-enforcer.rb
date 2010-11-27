@@ -61,10 +61,16 @@ module Rack
     end
     
     def replace_scheme(req, scheme)
+      if @options[:redirect_to]
+        uri = URI.split(@options[:redirect_to])
+        uri = uri[2] || uri[5]
+      else
+        uri = nil
+      end
       Rack::Request.new(req.env.merge(
         'rack.url_scheme' => scheme,
         'SERVER_PORT' => port_for(scheme).to_s
-      ).merge(@options[:redirect_to] ? {'HTTP_HOST' => URI.parse(@options[:redirect_to]).host} : {}))
+      ).merge(uri ? {'HTTP_HOST' => uri} : {}))
     end
     
     def port_for(scheme)

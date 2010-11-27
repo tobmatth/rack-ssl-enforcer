@@ -74,6 +74,14 @@ class TestRackSslEnforcer < Test::Unit::TestCase
       assert_equal 'https://www.google.com/admin?token=33', last_response.location
     end
     
+    should 'redirect to :redirect_to when host without scheme given' do
+      mock_app :redirect_to => 'www.google.com'
+      
+      get 'http://www.example.org/'
+      assert_equal 301, last_response.status
+      assert_equal 'https://www.google.com/', last_response.location
+    end
+    
     should 'respond not redirect ssl requests' do
       get 'https://www.example.org/'
       assert_equal 200, last_response.status
