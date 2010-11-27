@@ -65,7 +65,13 @@ class TestRackSslEnforcer < Test::Unit::TestCase
     should 'respond with a ssl redirect to plain-text requests and redirect to :redirect_to' do
       get 'http://www.example.org/'
       assert_equal 301, last_response.status
-      assert_equal 'https://www.google.com', last_response.location
+      assert_equal 'https://www.google.com/', last_response.location
+    end
+    
+    should 'respond with a ssl redirect to plain-text requests and redirect to :redirect_to and keep params' do
+      get 'http://www.example.org/admin?token=33'
+      assert_equal 301, last_response.status
+      assert_equal 'https://www.google.com/admin?token=33', last_response.location
     end
     
     should 'respond not redirect ssl requests' do
