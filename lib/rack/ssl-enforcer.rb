@@ -45,16 +45,24 @@ module Rack
       end
     end
     
+    # matches a path against a rule
+    # Accepts a string path, a regex matcher or an array of these
+    def match_rule?(options)
+      rules = [options].flatten
+      rules.any? do |pattern|
+        if pattern.is_a?(Regexp)
+          @req.path =~ pattern
+        else
+          @req.path[0, pattern.length] == pattern
+        end
+      end
+    end
+
     def enforce_ssl?(env)
       if @options[:only]
-        rules = [@options[:only]].flatten
-        rules.any? do |pattern|
-          if pattern.is_a?(Regexp)
-            @req.path =~ pattern
-          else
-            @req.path[0,pattern.length] == pattern
-          end
-        end
+        match_rule?(@options[:only])
+      elsif @options[:except]
+        !match_rule?(@options[:except])
       else
         true
       end

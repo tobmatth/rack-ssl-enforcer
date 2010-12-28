@@ -165,6 +165,97 @@ class TestRackSslEnforcer < Test::Unit::TestCase
       assert_equal ["id=1; path=/", "token=abc; path=/; secure; HttpOnly"], last_response.headers['Set-Cookie'].split("\n")
     end
   end
+
+  context 'that has regex pattern as except option' do
+    setup { mock_app :except => /^\/landing/ }
+    
+    should 'respond with a ssl redirect for /admin path' do
+      get 'http://www.example.org/admin'
+      assert_equal 301, last_response.status
+      assert_equal 'https://www.example.org/admin', last_response.location
+    end
+    
+    should 'respond not redirect ssl requests' do
+      get 'http://www.example.org/landing'
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
+    end
+    
+    should 'secure cookies' do
+      get 'https://www.example.org/'
+      assert_equal ["id=1; path=/; secure", "token=abc; path=/; secure; HttpOnly"], last_response.headers['Set-Cookie'].split("\n")
+    end
+  end
+  
+  context 'that has path as except option' do
+    setup { mock_app :except => "/landing" }
+    
+    should 'respond with a ssl redirect for /login path' do
+      get 'http://www.example.org/login'
+      assert_equal 301, last_response.status
+      assert_equal 'https://www.example.org/login', last_response.location
+    end
+    
+    should 'respond not redirect ssl requests' do
+      get 'http://www.example.org/landing/'
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
+    end
+  end
+  
+  context 'that has array of regex pattern & path as except option' do
+    setup { mock_app :except => [/\.rss$/, "/landing"] }
+    
+    should 'respond with a ssl redirect for /login path' do
+      get 'http://www.example.org/login'
+      assert_equal 301, last_response.status
+      assert_equal 'https://www.example.org/login', last_response.location
+    end
+    
+    should 'respond not redirect ssl redirect for /*.rss path' do
+      get 'http://www.example.org/users.rss'
+      assert_equal 200, last_response.status
+    end
+    
+    should 'respond not redirect ssl requests' do
+      get 'http://www.example.org/landing/'
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
+    end
+  end
+  
+  context 'that has array of regex pattern & path as except option with strict option' do
+    setup { mock_app :except => [/\.rss/, "/landing"], :strict => true }
+    
+    should 'respond with a http redirect from non-allowed https url' do
+      get 'https://www.example.org/foo/'
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
+    end
+    
+    should 'respond from allowed https url' do
+      get 'https://www.example.org/landing'
+      assert_equal 301, last_response.status
+      assert_equal 'http://www.example.org/landing', last_response.location
+    end
+    
+    should 'use default https port when redirecting non-standard ssl port to http' do
+      get 'https://example.org:81/landing', {}, { 'rack.url_scheme' => 'https' }
+      assert_equal 301, last_response.status
+      assert_equal 'http://example.org/landing', last_response.location
+    end
+
+    should 'secure cookies' do
+      get 'https://www.example.org/login'
+      assert_equal ["id=1; path=/; secure", "token=abc; path=/; secure; HttpOnly"], last_response.headers['Set-Cookie'].split("\n")
+    end
+    
+    should 'not secure cookies' do
+      get 'http://www.example.org/landing'
+      assert_equal ["id=1; path=/", "token=abc; path=/; secure; HttpOnly"], last_response.headers['Set-Cookie'].split("\n")
+    end
+  end
+
   
   context 'that has hsts options set' do
     setup { mock_app :hsts => {:expires => '500', :subdomains => false} }

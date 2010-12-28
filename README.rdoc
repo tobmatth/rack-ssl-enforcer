@@ -34,6 +34,12 @@ You can also define specific regex patterns or paths to redirect.
   config.middleware.use Rack::SslEnforcer, :only => /^\/admin\//
   config.middleware.use Rack::SslEnforcer, :only => "/login"
   config.middleware.use Rack::SslEnforcer, :only => ["/login", /\.xml$/]
+
+or define specific regex patterns or paths as exceptions.
+
+  config.middleware.use Rack::SslEnforcer, :except => /^\/admin\//
+  config.middleware.use Rack::SslEnforcer, :except => "/login"
+  config.middleware.use Rack::SslEnforcer, :except => ["/login", /\.xml$/]
   
 And force http for non-https path
 

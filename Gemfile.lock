@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    rack-ssl-enforcer (0.1.9)
+    rack-ssl-enforcer (0.2.0)
 
 GEM
   remote: http://rubygems.org/
@@ -40,6 +40,3 @@ DEPENDENCIES
   rack-test (~> 0.5.4)
   shoulda (~> 2.11.3)
   test-unit (~> 2.1.1)
-
-METADATA
-  version: 1.0.6
