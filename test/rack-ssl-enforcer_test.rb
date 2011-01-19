@@ -166,6 +166,22 @@ class TestRackSslEnforcer < Test::Unit::TestCase
     end
   end
   
+  context 'that has an empty array as only option' do
+    setup { mock_app :only => [], :strict => true }
+
+    should 'respond with no redirect for /login path' do
+      get 'http://www.example.org/foo'
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
+    end
+
+    should 'respond with a non-ssl redirect for /users.xml path' do
+      get 'https://www.example.org/users.xml'
+      assert_equal 301, last_response.status
+      assert_equal 'http://www.example.org/users.xml', last_response.location
+    end
+  end
+  
   context 'that has hsts options set' do
     setup { mock_app :hsts => {:expires => '500', :subdomains => false} }
     
