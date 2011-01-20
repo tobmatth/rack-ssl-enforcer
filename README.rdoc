@@ -29,15 +29,18 @@ You might need the :redirect_to option if the requested URL can't be determined 
 
   config.middleware.use Rack::SslEnforcer, :redirect_to => 'https://example.org'
   
-You can also define specific regex patterns or paths to redirect.
+You can also define specific regex patterns or paths or hosts to redirect.
   
   config.middleware.use Rack::SslEnforcer, :only => /^\/admin\//
   config.middleware.use Rack::SslEnforcer, :only => "/login"
   config.middleware.use Rack::SslEnforcer, :only => ["/login", /\.xml$/]
+  config.middleware.use Rack::SslEnforcer, :only_hosts => 'api.example.com'
+  config.middleware.use Rack::SslEnforcer, :only_hosts => ["[www|api]\.example\.org", 'example.com']
   
 And force http for non-https path
 
   config.middleware.use Rack::SslEnforcer, :only => ["/login", /\.xml$/], :strict => true
+  config.middleware.use Rack::SslEnforcer, :only_hosts => 'api.example.com', :strict => true
 
 To set HSTS expiry and subdomain inclusion (defaults: one year, true)
 
@@ -56,6 +59,7 @@ To set HSTS expiry and subdomain inclusion (defaults: one year, true)
 * {Rémy Coutable}[http://github.com/rymai]
 * {Thibaud Guillaume-Gentil}[http://github.com/thibaudgg]
 * {Paul Annesley}[https://github.com/pda]
+* {Saimon Moore}[https://github.com/saimonmoore]
 
 
 == Credits
