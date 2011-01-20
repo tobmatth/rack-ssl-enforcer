@@ -96,6 +96,116 @@ class TestRackSslEnforcer < Test::Unit::TestCase
     end
   end
   
+  context 'that has domain as only_hosts option' do
+    setup { mock_app :only_hosts => "example.org" }
+
+    should 'respond with a ssl redirect for *.example.org' do
+      get 'http://www.example.org'
+      assert_equal 301, last_response.status
+      assert_equal 'https://www.example.org/', last_response.location
+    end
+
+    should 'respond not redirect ssl requests' do
+      get 'http://www.example.com'
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
+    end
+  end
+
+  context 'that has array of regex pattern & domain as only_hosts option' do
+    setup { mock_app :only_hosts => [/[www|api]\.example\.org$/, "example.com"] }
+
+    should 'respond with a ssl redirect for www.example.org' do
+      get 'http://www.example.org'
+      assert_equal 301, last_response.status
+      assert_equal 'https://www.example.org/', last_response.location
+    end
+
+    should 'respond with a ssl redirect for api.example.org' do
+      get 'http://api.example.org'
+      assert_equal 301, last_response.status
+      assert_equal 'https://api.example.org/', last_response.location
+    end
+
+    should 'respond with a ssl redirect for *.example.com' do
+      get 'http://goo.example.com'
+      assert_equal 301, last_response.status
+      assert_equal 'https://goo.example.com/', last_response.location
+    end
+
+    should 'respond not redirect ssl requests for example.org' do
+      get 'http://example.org'
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
+    end
+
+    should 'respond not redirect ssl requests for goo.example.org' do
+      get 'http://goo.example.org'
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
+    end
+  end
+
+  context 'that has regex pattern as only_hosts option' do
+    setup { mock_app :only_hosts => /[www|api]\.example\.co\.uk$/ }
+
+    should 'respond with a ssl redirect for www.example.co.uk' do
+      get 'http://www.example.co.uk'
+      assert_equal 301, last_response.status
+      assert_equal 'https://www.example.co.uk/', last_response.location
+    end
+
+    should 'respond with a ssl redirect for api.example.co.uk' do
+      get 'http://api.example.co.uk'
+      assert_equal 301, last_response.status
+      assert_equal 'https://api.example.co.uk/', last_response.location
+    end
+
+    should 'respond not redirect ssl requests for goo.example.co.uk' do
+      get 'http://goo.example.co.uk'
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
+    end
+
+    should 'respond not redirect ssl requests for goo.example.co.uk for goo.example.co.uk' do
+      get 'http://teambox.example.co.uk'
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
+    end
+  end
+
+  context 'that has array of regex pattern & domain as only_hosts option with strict option' do
+    setup { mock_app :only_hosts => [/[www|api]\.example\.org$/, "example.com"], :strict => true }
+    
+    should 'respond with a http redirect from non-allowed https url' do
+      get 'https://abc.example.org/'
+      assert_equal 301, last_response.status
+      assert_equal 'http://abc.example.org/', last_response.location
+    end
+    
+    should 'respond from allowed https url' do
+      get 'https://www.example.org/'
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
+    end
+    
+    should 'use default https port when redirecting non-standard ssl port to http' do
+      get 'https://goo.example.org:80/', {}, { 'rack.url_scheme' => 'https' }
+      assert_equal 301, last_response.status
+      assert_equal 'http://goo.example.org/', last_response.location
+    end
+
+    should 'secure cookies' do
+      get 'https://www.example.org/'
+      assert_equal ["id=1; path=/; secure", "token=abc; path=/; secure; HttpOnly"], last_response.headers['Set-Cookie'].split("\n")
+    end
+    
+    should 'not secure cookies' do
+      get 'http://goo.example.org/'
+      assert_equal ["id=1; path=/", "token=abc; path=/; secure; HttpOnly"], last_response.headers['Set-Cookie'].split("\n")
+    end
+  end
+
   context 'that has path as only option' do
     setup { mock_app :only => "/login" }
     
