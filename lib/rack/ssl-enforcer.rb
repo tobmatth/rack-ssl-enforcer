@@ -12,7 +12,7 @@ module Rack
       elsif ssl_request?(env) && @options[:strict]
         scheme = 'http'
       end
-      
+
       if scheme
         location = @options[:redirect_to] || replace_scheme(@req, scheme).url
         body     = "<html><body>You are being <a href=\"#{location}\">redirected</a>.</body></html>"
@@ -46,7 +46,7 @@ module Rack
     end
     
     def enforce_ssl?(env)
-      keys = [:only, :only_hosts]
+      keys = [:only, :only_hosts, :except, :except_hosts]
       if keys.any? {|option| @options.key?(option)}
         keys.any? do |key|
           rules = [@options[key]].flatten.compact
@@ -55,15 +55,23 @@ module Rack
               case key
               when :only
                 @req.path =~ pattern
+              when :except
+                @req.path !~ pattern
               when :only_hosts
                 @req.host =~ pattern
+              when :except_hosts
+                @req.host !~ pattern
               end
             else
               case key
               when :only
                 @req.path[0,pattern.length] == pattern
+              when :except
+                @req.path[0,pattern.length] != pattern
               when :only_hosts
                 @req.host.end_with?(pattern)
+              when :except_hosts
+                !@req.host.end_with?(pattern)
               end
             end
           end
