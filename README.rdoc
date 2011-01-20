@@ -34,13 +34,19 @@ You can also define specific regex patterns or paths or hosts to redirect.
   config.middleware.use Rack::SslEnforcer, :only => /^\/admin\//
   config.middleware.use Rack::SslEnforcer, :only => "/login"
   config.middleware.use Rack::SslEnforcer, :only => ["/login", /\.xml$/]
+  config.middleware.use Rack::SslEnforcer, :except => "/foo"
+  config.middleware.use Rack::SslEnforcer, :except => /\.json$/
   config.middleware.use Rack::SslEnforcer, :only_hosts => 'api.example.com'
   config.middleware.use Rack::SslEnforcer, :only_hosts => ["[www|api]\.example\.org", 'example.com']
+  config.middleware.use Rack::SslEnforcer, :except_hosts => 'help.example.com'
+  config.middleware.use Rack::SslEnforcer, :except_hosts => /[help|blog]\.example\.com$/
   
 And force http for non-https path
 
   config.middleware.use Rack::SslEnforcer, :only => ["/login", /\.xml$/], :strict => true
+  config.middleware.use Rack::SslEnforcer, :except => 'api.example.com', :strict => true
   config.middleware.use Rack::SslEnforcer, :only_hosts => 'api.example.com', :strict => true
+  config.middleware.use Rack::SslEnforcer, :except_hosts => 'api.example.com', :strict => true
 
 To set HSTS expiry and subdomain inclusion (defaults: one year, true)
 
