@@ -46,13 +46,26 @@ module Rack
     end
     
     def enforce_ssl?(env)
-      if @options[:only]
-        rules = [@options[:only]].flatten
-        rules.any? do |pattern|
-          if pattern.is_a?(Regexp)
-            @req.path =~ pattern
-          else
-            @req.path[0,pattern.length] == pattern
+      keys = [:only, :only_hosts]
+      if keys.any? {|option| @options.key?(option)}
+        keys.any? do |key|
+          rules = [@options[key]].flatten.compact
+          rules.any? do |pattern|
+            if pattern.is_a?(Regexp)
+              case key
+              when :only
+                @req.path =~ pattern
+              when :only_hosts
+                @req.host =~ pattern
+              end
+            else
+              case key
+              when :only
+                @req.path[0,pattern.length] == pattern
+              when :only_hosts
+                @req.host.end_with?(pattern)
+              end
+            end
           end
         end
       else
