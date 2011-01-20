@@ -48,9 +48,9 @@ class TestRackSslEnforcer < Test::Unit::TestCase
       assert_equal ["id=1; path=/; secure", "token=abc; path=/; secure; HttpOnly"], last_response.headers['Set-Cookie'].split("\n")
     end
     
-    should 'set default hsts headers to all ssl requests' do
+    should 'not set default hsts headers to all ssl requests' do
       get 'https://www.example.org/'
-      assert_equal "max-age=31536000; includeSubDomains", last_response.headers["Strict-Transport-Security"] 
+      assert last_response.headers["Strict-Transport-Security"].nil?
     end
     
     should 'not set hsts headers to non ssl requests' do
