@@ -238,14 +238,162 @@ class TestRackSslEnforcer < Test::Unit::TestCase
   context 'that has domain as only_hosts option' do
     setup { mock_app :only_hosts => "example.org" }
 
-    should 'respond with a ssl redirect for *.example.org' do
-      get 'http://www.example.org'
+    should 'respond with a ssl redirect for example.org' do
+      get 'http://example.org'
       assert_equal 301, last_response.status
-      assert_equal 'https://www.example.org/', last_response.location
+      assert_equal 'https://example.org/', last_response.location
+    end
+
+    should 'respond not redirect ssl requests for *.example.org' do
+      get 'http://www.example.org'
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
     end
 
     should 'respond not redirect ssl requests' do
       get 'http://www.example.com'
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
+    end
+  end
+
+  context 'that has domain as only_hosts option and only option' do
+    setup { mock_app :only_hosts => "example.org", :only => '/foo' }
+
+    should 'respond with a ssl redirect for example.org/foo' do
+      get 'http://example.org/foo'
+      assert_equal 301, last_response.status
+      assert_equal 'https://example.org/foo', last_response.location
+    end
+
+    should 'respond not redirect ssl requests for example.org/bar' do
+      get 'http://example.org/bar'
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
+    end
+
+    should 'respond not redirect ssl requests for www.example.org' do
+      get 'http://www.example.org'
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
+    end
+
+    should 'respond not redirect ssl requests for www.example.org/foo' do
+      get 'http://www.example.org/foo'
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
+    end
+
+    should 'respond not redirect ssl requests for www.example.org/bar' do
+      get 'http://www.example.org/bar'
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
+    end
+  end
+
+  context 'that has domain as only_hosts option and except option' do
+    setup { mock_app :only_hosts => "example.org", :except => '/foo' }
+
+    should 'respond with a ssl redirect for example.org/bar' do
+      get 'http://example.org/bar'
+      assert_equal 301, last_response.status
+      assert_equal 'https://example.org/bar', last_response.location
+    end
+
+    should 'respond not redirect ssl requests for example.org/foo' do
+      get 'http://example.org/foo'
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
+    end
+
+    should 'respond not redirect ssl requests for www.example.org' do
+      get 'http://www.example.org'
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
+    end
+
+    should 'respond not redirect ssl requests for www.example.org/bar' do
+      get 'http://www.example.org/bar'
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
+    end
+
+    should 'respond not redirect ssl requests for www.example.org/foo' do
+      get 'http://www.example.org/foo'
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
+    end
+  end
+
+  context 'that has domain as except_hosts option and only option' do
+    setup { mock_app :except_hosts => "example.org", :only => '/foo' }
+
+    should 'respond with a ssl redirect for example.com/foo' do
+      get 'http://example.com/foo'
+      assert_equal 301, last_response.status
+      assert_equal 'https://example.com/foo', last_response.location
+    end
+
+    should 'respond not redirect ssl requests for example.org/foo' do
+      get 'http://example.org/foo'
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
+    end
+
+    should 'respond not redirect ssl requests for example.com/bar' do
+      get 'http://example.com/bar'
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
+    end
+
+    should 'respond with a ssl redirect for www.example.org/foo' do
+      get 'http://www.example.org/foo'
+      assert_equal 301, last_response.status
+      assert_equal 'https://www.example.org/foo', last_response.location
+    end
+
+    should 'respond not redirect ssl requests for www.example.org/bar' do
+      get 'http://www.example.org/bar'
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
+    end
+  end
+
+  context 'that has domain as except_hosts option and except option' do
+    setup { mock_app :except_hosts => "example.org", :except => '/foo' }
+
+    should 'respond with a ssl redirect for example.com/bar' do
+      get 'http://example.com/bar'
+      assert_equal 301, last_response.status
+      assert_equal 'https://example.com/bar', last_response.location
+    end
+
+    should 'respond not redirect ssl requests for example.org/foo' do
+      get 'http://example.org/foo'
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
+    end
+
+    should 'respond not redirect ssl requests for example.org/bar' do
+      get 'http://example.org/bar'
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
+    end
+
+    should 'respond not redirect ssl requests for example.com/foo' do
+      get 'http://example.com/foo'
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
+    end
+
+    should 'respond with a ssl redirect for www.example.org/bar' do
+      get 'http://www.example.org/bar'
+      assert_equal 301, last_response.status
+      assert_equal 'https://www.example.org/bar', last_response.location
+    end
+
+    should 'respond not redirect ssl requests for www.example.org/foo' do
+      get 'http://www.example.org/foo'
       assert_equal 200, last_response.status
       assert_equal 'Hello world!', last_response.body
     end
@@ -266,10 +414,10 @@ class TestRackSslEnforcer < Test::Unit::TestCase
       assert_equal 'https://api.example.org/', last_response.location
     end
 
-    should 'respond with a ssl redirect for *.example.com' do
+    should 'respond not redirect ssl requests for *.example.com' do
       get 'http://goo.example.com'
-      assert_equal 301, last_response.status
-      assert_equal 'https://goo.example.com/', last_response.location
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
     end
 
     should 'respond not redirect ssl requests for example.org' do
