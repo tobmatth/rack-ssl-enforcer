@@ -84,6 +84,7 @@ module Rack
     def replace_scheme(req, scheme)
       Rack::Request.new(req.env.merge(
         'rack.url_scheme' => scheme,
+        'HTTP_X_FORWARDED_PROTO' => scheme,
         'SERVER_PORT' => port_for(scheme).to_s
       ))
     end
