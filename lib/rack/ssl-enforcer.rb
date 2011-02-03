@@ -1,6 +1,3 @@
-require 'ruby-debug'
-Debugger.start
-
 module Rack
   class SslEnforcer
     
