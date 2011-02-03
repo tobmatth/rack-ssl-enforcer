@@ -1,3 +1,6 @@
+require 'ruby-debug'
+Debugger.start
+
 module Rack
   class SslEnforcer
     
@@ -7,7 +10,7 @@ module Rack
     
     def call(env)
       @req = Rack::Request.new(env)
-      if enforce_ssl?(env)
+      if enforce_ssl?(@req)
         scheme = 'https' unless ssl_request?(env)
       elsif ssl_request?(env) && @options[:strict]
         scheme = 'http'
@@ -45,37 +48,60 @@ module Rack
       end
     end
     
-    def enforce_ssl?(env)
-      keys = [:only, :only_hosts, :except, :except_hosts]
+    def matches?(key, pattern, req)
+      if pattern.is_a?(Regexp)
+        case key
+        when :only
+          req.path =~ pattern
+        when :except
+          req.path !~ pattern
+        when :only_hosts
+          req.host =~ pattern
+        when :except_hosts
+          req.host !~ pattern
+        end
+      else
+        case key
+        when :only
+          req.path[0,pattern.length] == pattern
+        when :except
+          req.path[0,pattern.length] != pattern
+        when :only_hosts
+          req.host == pattern
+        when :except_hosts
+          req.host != pattern
+        end
+      end
+    end
+
+    def enforce_ssl_for?(keys, req)
       if keys.any? {|option| @options.key?(option)}
         keys.any? do |key|
           rules = [@options[key]].flatten.compact
           rules.any? do |pattern|
-            if pattern.is_a?(Regexp)
-              case key
-              when :only
-                @req.path =~ pattern
-              when :except
-                @req.path !~ pattern
-              when :only_hosts
-                @req.host =~ pattern
-              when :except_hosts
-                @req.host !~ pattern
-              end
-            else
-              case key
-              when :only
-                @req.path[0,pattern.length] == pattern
-              when :except
-                @req.path[0,pattern.length] != pattern
-              when :only_hosts
-                @req.host.end_with?(pattern)
-              when :except_hosts
-                !@req.host.end_with?(pattern)
-              end
-            end
+            matches?(key, pattern, req)
           end
         end
+      else
+        false
+      end
+    end
+
+    def enforce_ssl?(req)
+      path_keys = [:only, :except]
+      hosts_keys = [:only_hosts, :except_hosts]
+      if hosts_keys.any? {|option| @options.key?(option)}
+        if enforce_ssl_for?(hosts_keys, req)
+          if path_keys.any? {|option| @options.key?(option)}
+            enforce_ssl_for?(path_keys, req)
+          else
+            true
+          end
+        else
+          false
+        end
+      elsif path_keys.any? {|option| @options.key?(option)}
+        enforce_ssl_for?(path_keys, req)
       else
         true
       end
@@ -85,6 +111,7 @@ module Rack
       Rack::Request.new(req.env.merge(
         'rack.url_scheme' => scheme,
         'HTTP_X_FORWARDED_PROTO' => scheme,
+        'HTTP_X_FORWARDED_PORT' => port_for(scheme).to_s,
         'SERVER_PORT' => port_for(scheme).to_s
       ))
     end
