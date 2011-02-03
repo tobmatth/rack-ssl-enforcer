@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    rack-ssl-enforcer (0.2.1)
+    rack-ssl-enforcer (0.2.4)
 
 GEM
   remote: http://rubygems.org/
