@@ -169,7 +169,7 @@ class TestRackSslEnforcer < Test::Unit::TestCase
   context 'that has an empty array as only option' do
     setup { mock_app :only => [], :strict => true }
 
-    should 'respond with no redirect for /login path' do
+    should 'respond with no redirect for /foo path' do
       get 'http://www.example.org/foo'
       assert_equal 200, last_response.status
       assert_equal 'Hello world!', last_response.body
