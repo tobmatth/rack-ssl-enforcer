@@ -164,6 +164,11 @@ class TestRackSslEnforcer < Test::Unit::TestCase
       get 'http://www.example.org/'
       assert_equal ["id=1; path=/", "token=abc; path=/; secure; HttpOnly"], last_response.headers['Set-Cookie'].split("\n")
     end
+
+    should 'not set hsts' do
+      get 'http://www.example.org/'
+      assert !last_response.headers["Strict-Transport-Security"]
+    end
   end
   
   context 'that has hsts options set' do
