@@ -67,16 +67,16 @@ class TestRackSslEnforcer < Test::Unit::TestCase
       assert_equal 301, last_response.status
       assert_equal 'https://www.google.com/', last_response.location
     end
-    
+
     should 'respond with a ssl redirect to plain-text requests and redirect to :redirect_to and keep params' do
       get 'http://www.example.org/admin?token=33'
       assert_equal 301, last_response.status
       assert_equal 'https://www.google.com/admin?token=33', last_response.location
     end
-    
+
     should 'redirect to :redirect_to when host without scheme given' do
       mock_app :redirect_to => 'www.google.com'
-      
+
       get 'http://www.example.org/'
       assert_equal 301, last_response.status
       assert_equal 'https://www.google.com/', last_response.location
@@ -579,6 +579,22 @@ class TestRackSslEnforcer < Test::Unit::TestCase
     should 'not set hsts' do
       get 'http://www.example.org/'
       assert !last_response.headers["Strict-Transport-Security"]
+    end
+  end
+
+  context 'that has an empty array as only option' do
+    setup { mock_app :only => [], :strict => true }
+
+    should 'respond with no redirect for /foo path' do
+      get 'http://www.example.org/foo'
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
+    end
+
+    should 'respond with a non-ssl redirect for /users.xml path' do
+      get 'https://www.example.org/users.xml'
+      assert_equal 301, last_response.status
+      assert_equal 'http://www.example.org/users.xml', last_response.location
     end
   end
 
