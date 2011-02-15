@@ -49,6 +49,12 @@ Use the :strict option to force http for all requests not matching your :only sp
   config.middleware.use Rack::SslEnforcer, :only => ["/login", /\.xml$/], :strict => true
   config.middleware.use Rack::SslEnforcer, :only_hosts => 'api.example.com', :strict => true
 
+Or in the case where you have matching urls with different methods (rails restful routes: get#users post#users || get#user/:id put#user/:id) you may need to post and put to secure but redirect to http on get.
+
+  config.middleware.use Rack::SslEnforcer, :only => [/^\/users\/(.+)\/edit/], :mixed => true
+
+The above will allow you to post/put from the secure/non-secure urls keeping the original schema.
+
 To set HSTS expiry and subdomain inclusion (defaults: one year, true). Strict option disables HSTS.
 
   config.middleware.use Rack::SslEnforcer, :hsts => { :expires => 500, :subdomains => false }
