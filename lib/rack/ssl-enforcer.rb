@@ -141,7 +141,8 @@ module Rack
 
     # see http://en.wikipedia.org/wiki/Strict_Transport_Security
     def set_hsts_headers!(headers)
-      opts = { :expires => 31536000, :subdomains => true }.merge(@options[:hsts] || {})
+      opts = { :expires => 31536000, :subdomains => true }
+      opts.merge(@options[:hsts]) if @options[:hsts].is_a? Hash
       value  = "max-age=#{opts[:expires]}"
       value += "; includeSubDomains" if opts[:subdomains]
       headers.merge!({ 'Strict-Transport-Security' => value })
