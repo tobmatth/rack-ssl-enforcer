@@ -532,7 +532,7 @@ class TestRackSslEnforcer < Test::Unit::TestCase
   end
 
   context 'that has regex pattern as except_hosts option with strict option' do
-    setup { mock_app :except_hosts => /[www|api]\.example\.org$/, :strict => true }
+    setup { mock_app :except_hosts => /[www|api]\.example\.org$/, :hsts => true, :strict => true }
 
     should 'respond with a http redirect from non-allowed https url' do
       get 'https://www.example.org/'
@@ -560,6 +560,11 @@ class TestRackSslEnforcer < Test::Unit::TestCase
     should 'not secure cookies' do
       get 'http://www.example.org/'
       assert_equal ["id=1; path=/", "token=abc; path=/; secure; HttpOnly"], last_response.headers['Set-Cookie'].split("\n")
+    end
+
+    should 'not set hsts' do
+      get 'http://www.example.org/'
+      assert !last_response.headers["Strict-Transport-Security"]
     end
   end
 

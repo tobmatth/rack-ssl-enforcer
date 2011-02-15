@@ -1,7 +1,7 @@
 = Rack::SslEnforcer
 
 Rack::SslEnforcer is a simple Rack middleware to enforce ssl connections. As of Version 0.2.0, Rack::SslEnforcer marks
-Cookies as secure and enables HSTS by default.
+Cookies as secure by default (HSTS must be set manually).
 
 
 == Installation
@@ -16,7 +16,7 @@ Cookies as secure and enables HSTS by default.
 
 Or, if you are using Bundler, just add this to your Gemfile:
 
-  gem 'rack-ssl-enforcer', :require => 'rack/ssl-enforcer'
+  gem 'rack-ssl-enforcer'
 
 To use Rack::SslEnforcer in your Rails application, add the following line to your application
 config file (config/application.rb for Rails3, config/environment.rb for Rails2):
@@ -49,9 +49,10 @@ Use the :strict option to force http for all requests not matching your :only sp
   config.middleware.use Rack::SslEnforcer, :only => ["/login", /\.xml$/], :strict => true
   config.middleware.use Rack::SslEnforcer, :only_hosts => 'api.example.com', :strict => true
 
-To set HSTS expiry and subdomain inclusion (defaults: one year, true)
+To set HSTS expiry and subdomain inclusion (defaults: one year, true). Strict option disables HSTS.
 
-  config.middleware.use Rack::SslEnforcer, :hsts => {:expires => 500, :subdomains => false}
+  config.middleware.use Rack::SslEnforcer, :hsts => { :expires => 500, :subdomains => false }
+  config.middleware.use Rack::SslEnforcer, :hsts => true # equivalent to { :expires => 31536000, :subdomains => true }
 
 
 == TODO

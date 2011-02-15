@@ -20,7 +20,7 @@ module Rack
       elsif ssl_request?(env)
         status, headers, body = @app.call(env)
         flag_cookies_as_secure!(headers)
-        set_hsts_headers!(headers) if @options[:hsts]
+        set_hsts_headers!(headers) if @options[:hsts] && !@options[:strict]
         [status, headers, body]
       else
         @app.call(env)
