@@ -1,10 +1,10 @@
 module Rack
   class SslEnforcer
-    
+
     def initialize(app, options = {})
       @app, @options = app, options
     end
-    
+
     def call(env)
       @req = Rack::Request.new(env)
       if enforce_ssl?(@req)
@@ -26,14 +26,13 @@ module Rack
         @app.call(env)
       end
     end
-    
-    
+
   private
-    
+
     def ssl_request?(env)
       scheme(env) == 'https'
     end
-    
+
     # Fixed in rack >= 1.3
     def scheme(env)
       if env['HTTPS'] == 'on'
@@ -44,7 +43,7 @@ module Rack
         env['rack.url_scheme']
       end
     end
-    
+
     def matches?(key, pattern, req)
       if pattern.is_a?(Regexp)
         case key
@@ -103,7 +102,7 @@ module Rack
         true
       end
     end
-    
+
     def replace_scheme(req, scheme)
       Rack::Request.new(req.env.merge(
         'rack.url_scheme' => scheme,
@@ -112,7 +111,7 @@ module Rack
         'SERVER_PORT' => port_for(scheme).to_s
       ))
     end
-    
+
     def port_for(scheme)
       scheme == 'https' ? 443 : 80
     end
@@ -129,7 +128,7 @@ module Rack
         }.join("\n")
       end
     end
-    
+
     # see http://en.wikipedia.org/wiki/Strict_Transport_Security
     def set_hsts_headers!(headers)
       opts = { :expires => 31536000, :subdomains => true }.merge(@options[:hsts] || {})
@@ -137,6 +136,6 @@ module Rack
       value += "; includeSubDomains" if opts[:subdomains]
       headers.merge!({ 'Strict-Transport-Security' => value })
     end
-    
+
   end
 end

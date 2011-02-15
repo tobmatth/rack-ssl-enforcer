@@ -13,7 +13,7 @@ Cookies as secure and enables HSTS by default.
 
   require 'rack/ssl-enforcer'
   use Rack::SslEnforcer
-  
+
 Or, if you are using Bundler, just add this to your Gemfile:
 
   gem 'rack-ssl-enforcer', :require => 'rack/ssl-enforcer'
@@ -31,9 +31,9 @@ If all you want is SSL for your whole application, you are done! However, you ca
 You might need the :redirect_to option if the requested URL can't be determined (e.g. if using a proxy).
 
   config.middleware.use Rack::SslEnforcer, :redirect_to => 'https://example.org'
-  
+
 You can also define specific regex patterns or paths or hosts to redirect.
-  
+
   config.middleware.use Rack::SslEnforcer, :only => /^\/admin\//
   config.middleware.use Rack::SslEnforcer, :only => "/login"
   config.middleware.use Rack::SslEnforcer, :only => ["/login", /\.xml$/]
@@ -43,7 +43,7 @@ You can also define specific regex patterns or paths or hosts to redirect.
   config.middleware.use Rack::SslEnforcer, :except_hosts => /[help|blog]\.example\.com$/
 
 Note: hosts options take precedence over the path options. See tests for examples.
-  
+
 Use the :strict option to force http for all requests not matching your :only specification
 
   config.middleware.use Rack::SslEnforcer, :only => ["/login", /\.xml$/], :strict => true
@@ -75,13 +75,13 @@ Flagging cookies as secure functionality and HSTS support is greatly inspired by
 
 
 == Note on Patches/Pull Requests
- 
+
 * Fork the project.
 * Make your feature addition or bug fix.
 * Add tests for it. This is important so I don't break it in a
   future version unintentionally.
 * Commit, do not mess with rakefile, version, or history.
-  (if you want to have your own version, 
+  (if you want to have your own version,
   that is fine but bump version in a commit by itself I can ignore when I pull)
 * Send me a pull request. Bonus points for topic branches.
 

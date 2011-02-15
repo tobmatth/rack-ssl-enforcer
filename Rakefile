@@ -27,7 +27,7 @@ require 'rake/rdoctask'
 require 'rack/ssl-enforcer/version'
 Rake::RDocTask.new do |rdoc|
   version = Rack::SslEnforcer::VERSION
-  
+
   rdoc.rdoc_dir = 'rdoc'
   rdoc.title = "rack-ssl-enforcer #{version}"
   rdoc.rdoc_files.include('README*')
