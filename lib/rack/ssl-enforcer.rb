@@ -78,8 +78,10 @@ module Rack
       if keys.any? {|option| @options.key?(option)}
         keys.any? do |key|
           rules = [@options[key]].flatten.compact
-          rules.any? do |pattern|
-            matches?(key, pattern, req)
+          unless rules.empty?
+            rules.send(key == :except_hosts || key == :except ? "all?" : "any?") do |pattern|
+              matches?(key, pattern, req)
+            end
           end
         end
       else

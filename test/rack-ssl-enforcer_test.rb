@@ -201,6 +201,29 @@ class TestRackSslEnforcer < Test::Unit::TestCase
     end
   end
 
+  context 'that has an array of string and regex patterns as except option' do
+    setup { mock_app :except => [/^\/foo/, "/bar"] }
+
+    should 'respond with a ssl redirect for /admin path' do
+      get 'http://www.example.org/admin'
+      assert_equal 301, last_response.status
+      assert_equal 'https://www.example.org/admin', last_response.location
+    end
+
+    should 'not redirect ssl requests for /foo path' do
+      get 'http://www.example.org/foo'
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
+    end
+
+    should 'not redirect ssl requests for /bar path' do
+      get 'http://www.example.org/bar'
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
+    end
+
+  end
+
   context 'that has path as except option' do
     setup { mock_app :except => "/foo" }
 
@@ -518,6 +541,28 @@ class TestRackSslEnforcer < Test::Unit::TestCase
 
     should 'respond not redirect ssl requests' do
       get 'http://www.example.org'
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
+    end
+  end
+
+  context 'that has an array of domains as except_hosts option' do
+    setup { mock_app :except_hosts => ["www.example.com", "example.com"] }
+
+    should 'respond with a ssl redirect for *.example.org' do
+      get 'http://api.example.org'
+      assert_equal 301, last_response.status
+      assert_equal 'https://api.example.org/', last_response.location
+    end
+
+    should 'not redirect www.example.com' do
+      get "http://www.example.com"
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
+    end
+
+    should 'not redirect example.com' do
+      get "http://example.com"
       assert_equal 200, last_response.status
       assert_equal 'Hello world!', last_response.body
     end
