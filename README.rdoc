@@ -38,7 +38,7 @@ You can also define specific regex patterns or paths or hosts to redirect.
   config.middleware.use Rack::SslEnforcer, :only => "/login"
   config.middleware.use Rack::SslEnforcer, :only => ["/login", /\.xml$/]
   config.middleware.use Rack::SslEnforcer, :only_hosts => 'api.example.com'
-  config.middleware.use Rack::SslEnforcer, :only_hosts => ["[www|api]\.example\.org", 'example.com']
+  config.middleware.use Rack::SslEnforcer, :only_hosts => [/[www|api]\.example\.org$/, 'example.com']
   config.middleware.use Rack::SslEnforcer, :except_hosts => 'help.example.com'
   config.middleware.use Rack::SslEnforcer, :except_hosts => /[help|blog]\.example\.com$/
 
