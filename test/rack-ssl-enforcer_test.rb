@@ -700,5 +700,17 @@ class TestRackSslEnforcer < Test::Unit::TestCase
       assert !last_response.headers["Strict-Transport-Security"].include?("includeSubDomains")
     end
   end
+  
+  context 'that has force_secure_cookie option set to false' do
+    $stderr = StringIO.new
+    setup { mock_app :force_secure_cookies => false }
+    
+    should 'not secure cookies but warn the user of the consequences' do
+      get 'https://www.example.org/users/123/edit'
+      assert_equal ["id=1; path=/", "token=abc; path=/; secure; HttpOnly"], last_response.headers['Set-Cookie'].split("\n")
+      $stderr.rewind
+      assert_equal "WARN -- : The option :force_secure_cookies is set to false so make sure your cookies are encoded and that you understand the consequences (see documentation)\n", $stderr.read
+    end
+  end
 
 end
