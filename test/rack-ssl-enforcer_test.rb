@@ -89,7 +89,7 @@ class TestRackSslEnforcer < Test::Unit::TestCase
     end
   end
 
-  context 'that has regex pattern as only option' do
+  context 'that has a regex pattern as :only option' do
     setup { mock_app :only => /^\/admin/ }
 
     should 'respond with a ssl redirect for /admin path' do
@@ -110,7 +110,7 @@ class TestRackSslEnforcer < Test::Unit::TestCase
     end
   end
 
-  context 'that has path as only option' do
+  context 'that has a string path as :only option' do
     setup { mock_app :only => "/login" }
 
     should 'respond with a ssl redirect for /login path' do
@@ -126,7 +126,7 @@ class TestRackSslEnforcer < Test::Unit::TestCase
     end
   end
 
-  context 'that has array of regex pattern & path as only option' do
+  context 'that has an array of regex patterns & string paths as :only option' do
     setup { mock_app :only => [/\.xml$/, "/login"] }
 
     should 'respond with a ssl redirect for /login path' do
@@ -148,7 +148,7 @@ class TestRackSslEnforcer < Test::Unit::TestCase
     end
   end
 
-  context 'that has array of regex pattern & path as only option with strict option' do
+  context 'that has an array of regex patterns & string paths as :only option with :strict = true' do
     setup { mock_app :only => [/\.xml$/, "/login"], :strict => true }
 
     should 'respond with a http redirect from non-allowed https url' do
@@ -180,7 +180,7 @@ class TestRackSslEnforcer < Test::Unit::TestCase
     end
   end
 
-  context 'that has regex pattern as except option' do
+  context 'that has a regex pattern as :except option' do
     setup { mock_app :except => /^\/foo/ }
 
     should 'respond with a ssl redirect for /admin path' do
@@ -201,7 +201,23 @@ class TestRackSslEnforcer < Test::Unit::TestCase
     end
   end
 
-  context 'that has an array of string and regex patterns as except option' do
+  context 'that has a string path as :except option' do
+    setup { mock_app :except => "/foo" }
+
+    should 'respond with a ssl redirect for /login path' do
+      get 'http://www.example.org/login'
+      assert_equal 301, last_response.status
+      assert_equal 'https://www.example.org/login', last_response.location
+    end
+
+    should 'respond not redirect ssl requests' do
+      get 'http://www.example.org/foo/'
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
+    end
+  end
+
+  context 'that has an array of regex patterns & string paths as :except option' do
     setup { mock_app :except => [/^\/foo/, "/bar"] }
 
     should 'respond with a ssl redirect for /admin path' do
@@ -224,23 +240,7 @@ class TestRackSslEnforcer < Test::Unit::TestCase
 
   end
 
-  context 'that has path as except option' do
-    setup { mock_app :except => "/foo" }
-
-    should 'respond with a ssl redirect for /login path' do
-      get 'http://www.example.org/login'
-      assert_equal 301, last_response.status
-      assert_equal 'https://www.example.org/login', last_response.location
-    end
-
-    should 'respond not redirect ssl requests' do
-      get 'http://www.example.org/foo/'
-      assert_equal 200, last_response.status
-      assert_equal 'Hello world!', last_response.body
-    end
-  end
-
-  context 'that has path as except option with strict option' do
+  context 'that has a string path as :except option with :strict = true' do
     setup { mock_app :except => "/foo", :strict => true }
 
     should 'respond with a http redirect from non-allowed https url' do
@@ -272,7 +272,7 @@ class TestRackSslEnforcer < Test::Unit::TestCase
     end
   end
 
-  context 'that has domain as only_hosts option' do
+  context 'that has a string domain as :only_hosts option' do
     setup { mock_app :only_hosts => "example.org" }
 
     should 'respond with a ssl redirect for example.org' do
@@ -294,7 +294,7 @@ class TestRackSslEnforcer < Test::Unit::TestCase
     end
   end
 
-  context 'that has domain as only_hosts option and only option' do
+  context 'that has a string domain as :only_hosts option & a string path as :only option' do
     setup { mock_app :only_hosts => "example.org", :only => '/foo' }
 
     should 'respond with a ssl redirect for example.org/foo' do
@@ -328,7 +328,7 @@ class TestRackSslEnforcer < Test::Unit::TestCase
     end
   end
 
-  context 'that has domain as only_hosts option and except option' do
+  context 'that has a string domain as :only_hosts option & a string path as :except option' do
     setup { mock_app :only_hosts => "example.org", :except => '/foo' }
 
     should 'respond with a ssl redirect for example.org/bar' do
@@ -362,7 +362,7 @@ class TestRackSslEnforcer < Test::Unit::TestCase
     end
   end
 
-  context 'that has domain as except_hosts option and only option' do
+  context 'that has a string domain as :except_hosts option & a string path as :only option' do
     setup { mock_app :except_hosts => "example.org", :only => '/foo' }
 
     should 'respond with a ssl redirect for example.com/foo' do
@@ -396,7 +396,7 @@ class TestRackSslEnforcer < Test::Unit::TestCase
     end
   end
 
-  context 'that has domain as except_hosts option and except option' do
+  context 'that has a string domain as :except_hosts option & a string path as :except option' do
     setup { mock_app :except_hosts => "example.org", :except => '/foo' }
 
     should 'respond with a ssl redirect for example.com/bar' do
@@ -436,7 +436,7 @@ class TestRackSslEnforcer < Test::Unit::TestCase
     end
   end
 
-  context 'that has array of regex pattern & domain as only_hosts option' do
+  context 'that has an array of regex patterns & string domains as :only_hosts option' do
     setup { mock_app :only_hosts => [/[www|api]\.example\.org$/, "example.com"] }
 
     should 'respond with a ssl redirect for www.example.org' do
@@ -470,7 +470,7 @@ class TestRackSslEnforcer < Test::Unit::TestCase
     end
   end
 
-  context 'that has regex pattern as only_hosts option' do
+  context 'that has a regex pattern as :only_hosts option' do
     setup { mock_app :only_hosts => /[www|api]\.example\.co\.uk$/ }
 
     should 'respond with a ssl redirect for www.example.co.uk' do
@@ -498,7 +498,7 @@ class TestRackSslEnforcer < Test::Unit::TestCase
     end
   end
 
-  context 'that has array of regex pattern & domain as only_hosts option with strict option' do
+  context 'that has an array of regex patterns & string domains as :only_hosts option with :strict = true' do
     setup { mock_app :only_hosts => [/[www|api]\.example\.org$/, "example.com"], :strict => true }
 
     should 'respond with a http redirect from non-allowed https url' do
@@ -530,7 +530,7 @@ class TestRackSslEnforcer < Test::Unit::TestCase
     end
   end
 
-  context 'that has domain as except_hosts option' do
+  context 'that has a string domain as :except_hosts option' do
     setup { mock_app :except_hosts => "www.example.org" }
 
     should 'respond with a ssl redirect for *.example.org' do
@@ -546,7 +546,7 @@ class TestRackSslEnforcer < Test::Unit::TestCase
     end
   end
 
-  context 'that has an array of domains as except_hosts option' do
+  context 'that has an array of domains as :except_hosts option' do
     setup { mock_app :except_hosts => ["www.example.com", "example.com"] }
 
     should 'respond with a ssl redirect for *.example.org' do
@@ -568,7 +568,7 @@ class TestRackSslEnforcer < Test::Unit::TestCase
     end
   end
 
-  context 'that has regex pattern as except_hosts option' do
+  context 'that has a regex pattern as :except_hosts option' do
     setup { mock_app :except_hosts => /[www|api]\.example\.co\.uk$/ }
 
     should 'respond with a ssl redirect for goo.example.co.uk' do
@@ -590,7 +590,7 @@ class TestRackSslEnforcer < Test::Unit::TestCase
     end
   end
 
-  context 'that has regex pattern as except_hosts option with strict option' do
+  context 'that has a regex pattern as :except_hosts option with :hsts = true & :strict = true' do
     setup { mock_app :except_hosts => /[www|api]\.example\.org$/, :hsts => true, :strict => true }
 
     should 'respond with a http redirect from non-allowed https url' do
@@ -627,7 +627,7 @@ class TestRackSslEnforcer < Test::Unit::TestCase
     end
   end
 
-  context 'that has an empty array as only option' do
+  context 'that has an empty array as :only option & :strict = true' do
     setup { mock_app :only => [], :strict => true }
 
     should 'respond with no redirect for /foo path' do
