@@ -37,7 +37,7 @@ end
 namespace(:test) do
   desc "Run all specs on multiple ruby versions (requires rvm)"
   task(:portability) do
-    %w[1.8.7 1.9.2].each do |version|
+    %w[1.8.7 1.9.2 ree jruby rbx].each do |version|
       system <<-BASH
         bash -c 'source ~/.rvm/scripts/rvm;
                  rvm #{version};
