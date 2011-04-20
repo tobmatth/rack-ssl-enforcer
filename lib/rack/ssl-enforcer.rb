@@ -3,6 +3,7 @@ module Rack
 
     def initialize(app, options={})
       @app, @options = app, options
+      $stderr.puts "WARN -- : The option :force_secure_cookies is set to false so make sure your cookies are encoded and that you understand the consequences (see documentation)" if options[:force_secure_cookies]==false
     end
 
     def call(env)
@@ -20,7 +21,7 @@ module Rack
         [301, { 'Content-Type' => 'text/html', 'Location' => location }, [body]]
       elsif ssl_request?(env)
         status, headers, body = @app.call(env)
-        flag_cookies_as_secure!(headers)
+        flag_cookies_as_secure!(headers) unless @options[:force_secure_cookies]==false
         set_hsts_headers!(headers) if @options[:hsts] && !@options[:strict]
         [status, headers, body]
       else

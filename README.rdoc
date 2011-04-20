@@ -60,6 +60,18 @@ To set HSTS expiry and subdomain inclusion (defaults: one year, true). Strict op
   config.middleware.use Rack::SslEnforcer, :hsts => { :expires => 500, :subdomains => false }
   config.middleware.use Rack::SslEnforcer, :hsts => true # equivalent to { :expires => 31536000, :subdomains => true }
 
+Finally you might want to share a cookie based session between http and https.
+This is not possible by default with Rack::SslEnforcer for security reasons.
+See: [http://en.wikipedia.org/wiki/HTTP_cookie#Cookie_hijacking]
+
+Nevertheless, you can set the option :force_secure_cookies to false in order to be able to share a cookie based session between http and https:
+
+  config.middleware.use Rack::SslEnforcer, :only => "/login", :force_secure_cookies => false
+
+But be aware that if you do so, you have to make sure that the content of you cookie is encoded.
+This can be done using a coder with Rack::Session::Cookie.
+See: [https://github.com/rack/rack/blob/master/lib/rack/session/cookie.rb#L28-42]
+
 
 == TODO
 
