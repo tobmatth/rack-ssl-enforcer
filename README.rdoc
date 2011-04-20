@@ -62,7 +62,7 @@ To set HSTS expiry and subdomain inclusion (defaults: one year, true). Strict op
 
 Finally you might want to share a cookie based session between http and https.
 This is not possible by default with Rack::SslEnforcer for security reasons.
-See: [http://en.wikipedia.org/wiki/HTTP_cookie#Cookie_hijacking]
+See: [http://en.wikipedia.org/wiki/HTTP_cookie#Cookie_theft_and_session_hijacking]
 
 Nevertheless, you can set the option :force_secure_cookies to false in order to be able to share a cookie based session between http and https:
 

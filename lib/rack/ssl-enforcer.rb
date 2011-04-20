@@ -2,7 +2,18 @@ module Rack
   class SslEnforcer
 
     def initialize(app, options={})
-      @app, @options = app, options
+      default_options = {
+        :redirect_to => nil,
+        :only => nil,
+        :only_hosts => nil,
+        :except => nil,
+        :except_hosts => nil,
+        :strict => false,
+        :mixed => false,
+        :hsts => nil,
+        :force_secure_cookies => true
+      }
+      @app, @options = app, default_options.merge(options)
       $stderr.puts "WARN -- : The option :force_secure_cookies is set to false so make sure your cookies are encoded and that you understand the consequences (see documentation)" if options[:force_secure_cookies]==false
     end
 
@@ -21,7 +32,7 @@ module Rack
         [301, { 'Content-Type' => 'text/html', 'Location' => location }, [body]]
       elsif ssl_request?(env)
         status, headers, body = @app.call(env)
-        flag_cookies_as_secure!(headers) unless @options[:force_secure_cookies]==false
+        flag_cookies_as_secure!(headers) if @options[:force_secure_cookies]
         set_hsts_headers!(headers) if @options[:hsts] && !@options[:strict]
         [status, headers, body]
       else
@@ -77,7 +88,7 @@ module Rack
     end
 
     def enforce_ssl_for?(keys, req)
-      if keys.any? {|option| @options.key?(option)}
+      if keys.any? { |option| @options[option] }
         keys.any? do |key|
           rules = [@options[key]].flatten.compact
           unless rules.empty?
@@ -94,9 +105,9 @@ module Rack
     def enforce_ssl?(req)
       path_keys = [:only, :except]
       hosts_keys = [:only_hosts, :except_hosts]
-      if hosts_keys.any? {|option| @options.key?(option)}
+      if hosts_keys.any? { |option| @options[option] }
         if enforce_ssl_for?(hosts_keys, req)
-          if path_keys.any? {|option| @options.key?(option)}
+          if path_keys.any? { |option| @options[option] }
             enforce_ssl_for?(path_keys, req)
           else
             true
@@ -104,7 +115,7 @@ module Rack
         else
           false
         end
-      elsif path_keys.any? {|option| @options.key?(option)}
+      elsif path_keys.any? { |option| @options[option] }
         enforce_ssl_for?(path_keys, req)
       else
         true
@@ -142,7 +153,7 @@ module Rack
     # see http://en.wikipedia.org/wiki/Strict_Transport_Security
     def set_hsts_headers!(headers)
       opts = { :expires => 31536000, :subdomains => true }
-      opts.merge!(@options[:hsts]) if @options[:hsts].is_a? Hash
+      opts.merge!(@options[:hsts])
       value  = "max-age=#{opts[:expires]}"
       value += "; includeSubDomains" if opts[:subdomains]
       headers.merge!({ 'Strict-Transport-Security' => value })
