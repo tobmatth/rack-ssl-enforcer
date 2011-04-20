@@ -1,15 +1,16 @@
 module Rack
   class SslEnforcer
 
-    def initialize(app, options = {})
+    def initialize(app, options={})
       @app, @options = app, options
     end
 
     def call(env)
       @req = Rack::Request.new(env)
-      if enforce_ssl?(@req)
+
+      if enforce_ssl?(@req) && !enforce_non_ssl?(env)
         scheme = 'https' unless ssl_request?(env)
-      elsif ssl_request?(env) && enforcement_non_ssl?(env)
+      elsif ssl_request?(env) && (@options[:strict] || enforce_non_ssl?(env))
         scheme = 'http'
       end
 
@@ -29,8 +30,8 @@ module Rack
 
   private
 
-    def enforcement_non_ssl?(env)
-      true if @options[:strict] || @options[:mixed] && !(env['REQUEST_METHOD'] == 'PUT' || env['REQUEST_METHOD'] == 'POST')
+    def enforce_non_ssl?(env)
+      @options[:mixed] && !%w[POST PUT].include?(env['REQUEST_METHOD'])
     end
 
     def ssl_request?(env)
