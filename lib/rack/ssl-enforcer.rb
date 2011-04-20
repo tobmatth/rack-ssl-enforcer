@@ -129,16 +129,12 @@ module Rack
       scheme == 'https' ? 443 : 80
     end
 
-    # see http://en.wikipedia.org/wiki/HTTP_cookie#Cookie_hijacking
+    # see http://en.wikipedia.org/wiki/HTTP_cookie#Cookie_theft_and_session_hijacking
     def flag_cookies_as_secure!(headers)
-      if cookies = headers['Set-Cookie']
-        headers['Set-Cookie'] = cookies.split("\n").map { |cookie|
-          if cookie !~ / secure;/
-            "#{cookie}; secure"
-          else
-            cookie
-          end
-        }.join("\n")
+      if headers['Set-Cookie']
+        headers['Set-Cookie'] = headers['Set-Cookie'].split("\n").map do |cookie|
+          cookie !~ / secure;/ ? "#{cookie}; secure" : cookie
+        end.join("\n")
       end
     end
 

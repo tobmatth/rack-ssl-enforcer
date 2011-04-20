@@ -50,12 +50,12 @@ class TestRackSslEnforcer < Test::Unit::TestCase
 
     should 'not set default hsts headers to all ssl requests' do
       get 'https://www.example.org/'
-      assert last_response.headers["Strict-Transport-Security"].nil?
+      assert !last_response.headers["Strict-Transport-Security"]
     end
 
     should 'not set hsts headers to non ssl requests' do
       get 'http://www.example.org/'
-      assert last_response.headers["Strict-Transport-Security"].nil?
+      assert !last_response.headers["Strict-Transport-Security"]
     end
   end
 
@@ -621,8 +621,23 @@ class TestRackSslEnforcer < Test::Unit::TestCase
       assert_equal ["id=1; path=/", "token=abc; path=/; secure; HttpOnly"], last_response.headers['Set-Cookie'].split("\n")
     end
 
-    should 'not set hsts' do
+    should 'not set hsts from non-allowed http url' do
       get 'http://www.example.org/'
+      assert !last_response.headers["Strict-Transport-Security"]
+    end
+
+    should 'not set hsts from non-allowed https url' do
+      get 'https://www.example.org/'
+      assert !last_response.headers["Strict-Transport-Security"]
+    end
+
+    should 'not set hsts from allowed http url' do
+      get 'http://abc.example.org/'
+      assert !last_response.headers["Strict-Transport-Security"]
+    end
+
+    should 'not set hsts from allowed https url' do
+      get 'https://abc.example.org/'
       assert !last_response.headers["Strict-Transport-Security"]
     end
   end
