@@ -657,89 +657,53 @@ class TestRackSslEnforcer < Test::Unit::TestCase
       assert_equal 'http://www.example.org/users.xml', last_response.location
     end
   end
-
-  context 'that has an array of regex patterns as :only option with :mixed = true' do
-    setup { mock_app :mixed => true }
-
-    should 'not redirect if get in http' do
-      get 'http://www.example.org/users/123/edit'
+  
+  context 'that has array of regex pattern & path as only option with strict option and post option' do
+    setup { mock_app :only => [/^\/users\/(.+)\/edit/], :mixed => true }
+    
+    should 'respond with a http redirect from non-allowed https url' do
+      get 'https://www.example.org/foo/'
+      assert_equal 301, last_response.status
+      assert_equal 'http://www.example.org/foo/', last_response.location
+    end
+    
+    should 'respond from allowed https url' do
+      get 'https://www.example.org/users/123/edit'
       assert_equal 200, last_response.status
       assert_equal 'Hello world!', last_response.body
     end
+    
+    should 'use default https port when redirecting non-standard ssl port to http' do
+      get 'https://example.org:81/', {}, { 'rack.url_scheme' => 'https' }
+      assert_equal 301, last_response.status
+      assert_equal 'http://example.org/', last_response.location
+    end
 
-    should 'redirect if get in https' do
+    should 'secure cookies' do
       get 'https://www.example.org/users/123/edit'
-      assert_equal 301, last_response.status
-      assert_equal 'http://www.example.org/users/123/edit', last_response.location
+      assert_equal ["id=1; path=/; secure", "token=abc; path=/; secure; HttpOnly"], last_response.headers['Set-Cookie'].split("\n")
     end
-
-    should 'redirect if post in http' do
-      post 'http://www.example.org/users/'
-      assert_equal 301, last_response.status
-      assert_equal 'https://www.example.org/users/', last_response.location
+    
+    should 'not secure cookies' do
+      get 'http://www.example.org/'
+      assert_equal ["id=1; path=/", "token=abc; path=/; secure; HttpOnly"], last_response.headers['Set-Cookie'].split("\n")
     end
-
-    should 'not redirect if post in https' do
+    
+    should 'not redirect if post' do
       post 'https://www.example.org/users/'
       assert_equal 200, last_response.status
       assert_equal 'Hello world!', last_response.body
     end
-
-    should 'redirect if put in http' do
-      put 'http://www.example.org/users/123'
-      assert_equal 301, last_response.status
-      assert_equal 'https://www.example.org/users/123', last_response.location
-    end
-
-    should 'not redirect if put in https' do
+    
+    should 'not redirect if put' do
       put 'https://www.example.org/users/123'
       assert_equal 200, last_response.status
       assert_equal 'Hello world!', last_response.body
     end
   end
-
-  context 'that has an array of regex patterns as :only option with :mixed = true and :strict = true' do
-    setup { mock_app :only => [%r{^/users/\d+/edit}], :mixed => true }
-
-    should 'not redirect if get in http' do
-      get 'http://www.example.org/users/123/edit'
-      assert_equal 200, last_response.status
-      assert_equal 'Hello world!', last_response.body
-    end
-
-    should 'redirect if get in https' do
-      get 'https://www.example.org/users/123/edit'
-      assert_equal 301, last_response.status
-      assert_equal 'http://www.example.org/users/123/edit', last_response.location
-    end
-
-    should 'not redirect if post in http' do
-      post 'http://www.example.org/users/'
-      assert_equal 200, last_response.status
-      assert_equal 'Hello world!', last_response.body
-    end
-
-    should 'not redirect if post in https' do
-      post 'https://www.example.org/users/'
-      assert_equal 200, last_response.status
-      assert_equal 'Hello world!', last_response.body
-    end
-
-    should 'not redirect if put in http' do
-      put 'http://www.example.org/users/123'
-      assert_equal 200, last_response.status
-      assert_equal 'Hello world!', last_response.body
-    end
-
-    should 'not redirect if put in https' do
-      put 'https://www.example.org/users/123'
-      assert_equal 200, last_response.status
-      assert_equal 'Hello world!', last_response.body
-    end
-  end
-
-  context 'that has :hsts options set' do
-    setup { mock_app :hsts => { :expires => '500', :subdomains => false } }
+  
+  context 'that has hsts options set' do
+    setup { mock_app :hsts => {:expires => '500', :subdomains => false} }
 
     should 'set expiry option' do
       get 'https://www.example.org/'

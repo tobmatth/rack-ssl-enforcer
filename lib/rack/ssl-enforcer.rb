@@ -19,10 +19,9 @@ module Rack
 
     def call(env)
       @req = Rack::Request.new(env)
-
-      if enforce_ssl?(@req) && !enforce_non_ssl?(env)
+      if enforce_ssl?(@req)
         scheme = 'https' unless ssl_request?(env)
-      elsif ssl_request?(env) && (@options[:strict] || enforce_non_ssl?(env))
+      elsif ssl_request?(env) && enforcement_non_ssl?(env)
         scheme = 'http'
       end
 
@@ -42,8 +41,8 @@ module Rack
 
   private
 
-    def enforce_non_ssl?(env)
-      @options[:mixed] && !%w[POST PUT].include?(env['REQUEST_METHOD'])
+    def enforcement_non_ssl?(env)
+      true if @options[:strict] || @options[:mixed] && !(env['REQUEST_METHOD'] == 'PUT' || env['REQUEST_METHOD'] == 'POST')
     end
 
     def ssl_request?(env)
