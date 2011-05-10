@@ -59,6 +59,26 @@ class TestRackSslEnforcer < Test::Unit::TestCase
     end
   end
 
+  context 'that has :ssl_port set' do
+    setup { mock_app :https_port => 9443 }
+
+    should 'respond with a ssl redirect to plain-text requests and redirect to a custom port' do
+      get 'http://www.example.org/'
+      assert_equal 301, last_response.status
+      assert_equal 'https://www.example.org:9443/', last_response.location
+    end
+  end
+
+  context 'that has a default :ssl_port set' do
+    setup { mock_app :https_port => 443 }
+
+    should 'respond with a ssl redirect to plain-text requests and redirect without a port identifier' do
+      get 'http://www.example.org/'
+      assert_equal 301, last_response.status
+      assert_equal 'https://www.example.org/', last_response.location
+    end
+  end
+
   context 'that has :redirect_to set' do
     setup { mock_app :redirect_to => 'https://www.google.com' }
 
