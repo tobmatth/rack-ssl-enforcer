@@ -59,6 +59,48 @@ class TestRackSslEnforcer < Test::Unit::TestCase
     end
   end
 
+  context 'With Rails 2.3 / Rack 1.1-style Array-based cookies' do
+    setup do
+      main_app = lambda { |env|
+        request = Rack::Request.new(env)
+        headers = {'Content-Type' => "text/html"}
+        headers['Set-Cookie'] = ["id=1; path=/", "token=abc; path=/; HttpOnly"]
+        [200, headers, ['Hello world!']]
+      }
+
+      builder = Rack::Builder.new
+      builder.use Rack::SslEnforcer
+      builder.run main_app
+      @app = builder.to_app
+    end
+
+    should 'secure multiple cookies' do
+      get 'https://www.example.org/'
+      assert_equal ["id=1; path=/; secure", "token=abc; path=/; HttpOnly; secure"], last_response.headers['Set-Cookie'].split("\n")
+    end
+  end
+
+
+  context 'that has :ssl_port set' do
+    setup { mock_app :https_port => 9443 }
+
+    should 'respond with a ssl redirect to plain-text requests and redirect to a custom port' do
+      get 'http://www.example.org/'
+      assert_equal 301, last_response.status
+      assert_equal 'https://www.example.org:9443/', last_response.location
+    end
+  end
+
+  context 'that has a default :ssl_port set' do
+    setup { mock_app :https_port => 443 }
+
+    should 'respond with a ssl redirect to plain-text requests and redirect without a port identifier' do
+      get 'http://www.example.org/'
+      assert_equal 301, last_response.status
+      assert_equal 'https://www.example.org/', last_response.location
+    end
+  end
+
   context 'that has :redirect_to set' do
     setup { mock_app :redirect_to => 'https://www.google.com' }
 
