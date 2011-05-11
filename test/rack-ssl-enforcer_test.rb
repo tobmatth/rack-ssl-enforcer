@@ -59,6 +59,28 @@ class TestRackSslEnforcer < Test::Unit::TestCase
     end
   end
 
+  context 'With Rails 2.3 / Rack 1.1-style Array-based cookies' do
+    setup do
+      main_app = lambda { |env|
+        request = Rack::Request.new(env)
+        headers = {'Content-Type' => "text/html"}
+        headers['Set-Cookie'] = ["id=1; path=/", "token=abc; path=/; HttpOnly"]
+        [200, headers, ['Hello world!']]
+      }
+
+      builder = Rack::Builder.new
+      builder.use Rack::SslEnforcer
+      builder.run main_app
+      @app = builder.to_app
+    end
+
+    should 'secure multiple cookies' do
+      get 'https://www.example.org/'
+      assert_equal ["id=1; path=/; secure", "token=abc; path=/; HttpOnly; secure"], last_response.headers['Set-Cookie'].split("\n")
+    end
+  end
+
+
   context 'that has :ssl_port set' do
     setup { mock_app :https_port => 9443 }
 
