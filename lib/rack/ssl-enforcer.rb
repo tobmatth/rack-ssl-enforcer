@@ -11,6 +11,8 @@ module Rack
         :strict => false,
         :mixed => false,
         :hsts => nil,
+        :http_port => nil,
+        :https_port => nil,
         :force_secure_cookies => true
       }
       @app, @options = app, default_options.merge(options)
@@ -137,13 +139,22 @@ module Rack
     end
 
     def port_for(scheme)
-      scheme == 'https' ? 443 : 80
+      if scheme == 'https'
+        @options[:https_port] || 443
+      else
+        @options[:http_port] || 80
+      end
     end
 
     # see http://en.wikipedia.org/wiki/HTTP_cookie#Cookie_theft_and_session_hijacking
     def flag_cookies_as_secure!(headers)
-      if headers['Set-Cookie']
-        headers['Set-Cookie'] = headers['Set-Cookie'].split("\n").map do |cookie|
+      if cookies = headers['Set-Cookie']
+        # Support Rails 2.3 / Rack 1.1 arrays as headers
+        if cookies.respond_to?(:split)
+          cookies = cookies.split("\n")
+        end
+
+        headers['Set-Cookie'] = cookies.map do |cookie|
           cookie !~ / secure;/ ? "#{cookie}; secure" : cookie
         end.join("\n")
       end
