@@ -150,7 +150,7 @@ module Rack
     def flag_cookies_as_secure!(headers)
       if cookies = headers['Set-Cookie']
         # Support Rails 2.3 / Rack 1.1 arrays as headers
-        if cookies.respond_to?(:split)
+        unless cookies.is_a?(Array)
           cookies = cookies.split("\n")
         end
 
