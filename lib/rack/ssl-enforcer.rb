@@ -1,6 +1,8 @@
 module Rack
   class SslEnforcer
 
+    # Warning: If you set the option force_secure_cookies to false, make sure that your cookies
+    #  are encoded and that you understand the consequences (see documentation)
     def initialize(app, options={})
       default_options = {
         :redirect_to => nil,
@@ -16,7 +18,6 @@ module Rack
         :force_secure_cookies => true
       }
       @app, @options = app, default_options.merge(options)
-      $stderr.puts "WARN -- : The option :force_secure_cookies is set to false so make sure your cookies are encoded and that you understand the consequences (see documentation)" if options[:force_secure_cookies]==false
     end
 
     def call(env)
