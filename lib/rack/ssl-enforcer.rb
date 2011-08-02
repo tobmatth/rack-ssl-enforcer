@@ -29,7 +29,7 @@ module Rack
       end
 
       if scheme
-        location = replace_scheme(@req, scheme).url
+        location = replace_scheme(@req, scheme)
         body     = "<html><body>You are being <a href=\"#{location}\">redirected</a>.</body></html>"
         [301, { 'Content-Type' => 'text/html', 'Location' => location }, [body]]
       elsif ssl_request?(env)
@@ -131,12 +131,10 @@ module Rack
       else
         uri = nil
       end
-      Rack::Request.new(req.env.merge(
-        'rack.url_scheme' => scheme,
-        'HTTP_X_FORWARDED_PROTO' => scheme,
-        'HTTP_X_FORWARDED_PORT' => port_for(scheme).to_s,
-        'SERVER_PORT' => port_for(scheme).to_s
-      ).merge(uri ? {'HTTP_HOST' => uri} : {}))
+      host = uri || req.host
+      port = port_for(scheme).to_s
+
+      URI.parse("#{scheme}://#{host}:#{port}#{req.fullpath}").to_s
     end
 
     def port_for(scheme)
