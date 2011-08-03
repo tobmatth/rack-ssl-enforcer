@@ -699,22 +699,22 @@ class TestRackSslEnforcer < Test::Unit::TestCase
       assert_equal 'http://www.example.org/users.xml', last_response.location
     end
   end
-  
+
   context 'that has array of regex pattern & path as only option with strict option and post option' do
     setup { mock_app :only => [/^\/users\/(.+)\/edit/], :mixed => true }
-    
+
     should 'respond with a http redirect from non-allowed https url' do
       get 'https://www.example.org/foo/'
       assert_equal 301, last_response.status
       assert_equal 'http://www.example.org/foo/', last_response.location
     end
-    
+
     should 'respond from allowed https url' do
       get 'https://www.example.org/users/123/edit'
       assert_equal 200, last_response.status
       assert_equal 'Hello world!', last_response.body
     end
-    
+
     should 'use default https port when redirecting non-standard ssl port to http' do
       get 'https://example.org:81/', {}, { 'rack.url_scheme' => 'https' }
       assert_equal 301, last_response.status
@@ -725,25 +725,25 @@ class TestRackSslEnforcer < Test::Unit::TestCase
       get 'https://www.example.org/users/123/edit'
       assert_equal ["id=1; path=/; secure", "token=abc; path=/; secure; HttpOnly"], last_response.headers['Set-Cookie'].split("\n")
     end
-    
+
     should 'not secure cookies' do
       get 'http://www.example.org/'
       assert_equal ["id=1; path=/", "token=abc; path=/; secure; HttpOnly"], last_response.headers['Set-Cookie'].split("\n")
     end
-    
+
     should 'not redirect if post' do
       post 'https://www.example.org/users/'
       assert_equal 200, last_response.status
       assert_equal 'Hello world!', last_response.body
     end
-    
+
     should 'not redirect if put' do
       put 'https://www.example.org/users/123'
       assert_equal 200, last_response.status
       assert_equal 'Hello world!', last_response.body
     end
   end
-  
+
   context 'that has hsts options set' do
     setup { mock_app :hsts => {:expires => '500', :subdomains => false} }
 
@@ -757,16 +757,13 @@ class TestRackSslEnforcer < Test::Unit::TestCase
       assert !last_response.headers["Strict-Transport-Security"].include?("includeSubDomains")
     end
   end
-  
+
   context 'that has force_secure_cookie option set to false' do
-    $stderr = StringIO.new
     setup { mock_app :force_secure_cookies => false }
-    
+
     should 'not secure cookies but warn the user of the consequences' do
       get 'https://www.example.org/users/123/edit'
       assert_equal ["id=1; path=/", "token=abc; path=/; secure; HttpOnly"], last_response.headers['Set-Cookie'].split("\n")
-      $stderr.rewind
-      assert_equal "WARN -- : The option :force_secure_cookies is set to false so make sure your cookies are encoded and that you understand the consequences (see documentation)\n", $stderr.read
     end
   end
 
