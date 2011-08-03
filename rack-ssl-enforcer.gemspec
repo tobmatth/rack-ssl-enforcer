@@ -16,9 +16,7 @@ Gem::Specification.new do |s|
   s.rubyforge_project         = "rack-ssl-enforcer"
 
   s.add_development_dependency "bundler",    "~> 1.0"
-  s.add_development_dependency "guard",      "~> 0.3.3"
-  s.add_development_dependency "guard-test", "~> 0.2"
-  s.add_development_dependency "test-unit",  "~> 2.2"
+  s.add_development_dependency "test-unit",  "~> 2.3"
   s.add_development_dependency "shoulda",    "~> 2.11.3"
   s.add_development_dependency "rack",       "~> 1.2.0"
   s.add_development_dependency "rack-test",  "~> 0.5.4"
