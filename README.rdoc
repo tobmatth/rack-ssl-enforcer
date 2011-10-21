@@ -74,6 +74,21 @@ This can be done using a coder with Rack::Session::Cookie.
 See: [https://github.com/rack/rack/blob/master/lib/rack/session/cookie.rb#L28-42]
 
 
+== Deployment
+
+If you run your application behind a proxy (e.g. Nginx) you may need to do some configuration on that side. If you don't you may experience an infinite redirect loop.
+
+The reason this happens is that Rack::SslEnforcer can't detect if you are running SSL or not. The solution is to have your front-end server send extra headers for Rack::SslEnforcer to identify the request protocol.
+
+=== Nginx
+
+In the `location` block for your app's SSL configuration, include the following proxy header configuration:
+
+  proxy_set_header   X-Forwarded-Proto https;
+
+This makes sure that Rack::SslEnforcer knows it's being accessed over SSL. Just restart Nginx for these changes to take effect.
+
+
 == TODO
 
 * Add configuration option to specify local http / https ports
