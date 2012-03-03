@@ -1,7 +1,6 @@
 require 'helper'
 
 class TestRackSslEnforcer < Test::Unit::TestCase
-
   context 'that has no :redirect_to set' do
     setup { mock_app }
 
@@ -79,7 +78,6 @@ class TestRackSslEnforcer < Test::Unit::TestCase
       assert_equal ["id=1; path=/; secure", "token=abc; path=/; HttpOnly; secure"], last_response.headers['Set-Cookie'].split("\n")
     end
   end
-
 
   context 'that has :ssl_port set' do
     setup { mock_app :https_port => 9443 }
@@ -767,4 +765,35 @@ class TestRackSslEnforcer < Test::Unit::TestCase
     end
   end
 
+  context 'that has a string method as only_methods option' do
+    setup { mock_app :only_methods => 'POST' } 
+    
+    should 'respond with a ssl redirect for post method' do
+      post 'http://www.example.org/', 'param=value'
+      assert_equal 301, last_response.status
+      assert_equal 'https://www.example.org/', last_response.location      
+    end
+   
+    should 'respond not redirect ssl requests' do
+      get 'http://www.example.org/'
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
+    end
+  end
+  
+  context 'that has a string method as except_methods option' do
+    setup { mock_app :except_methods => 'GET' } 
+
+    should 'respond with a ssl redirect for post method' do
+      post 'http://www.example.org/', 'param=value'
+      assert_equal 301, last_response.status
+      assert_equal 'https://www.example.org/', last_response.location      
+    end
+ 
+    should 'respond not redirect ssl requests' do
+      get 'http://www.example.org/'
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
+    end
+  end
 end

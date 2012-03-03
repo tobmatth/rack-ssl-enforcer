@@ -85,6 +85,10 @@ module Rack
           req.host == pattern
         when :except_hosts
           req.host != pattern
+        when :only_methods
+          req.env['REQUEST_METHOD'] == pattern
+        when :except_methods
+          req.env['REQUEST_METHOD'] != pattern
         end
       end
     end
@@ -105,23 +109,33 @@ module Rack
     end
 
     def enforce_ssl?(req)
-      path_keys = [:only, :except]
-      hosts_keys = [:only_hosts, :except_hosts]
-      if hosts_keys.any? { |option| @options[option] }
-        if enforce_ssl_for?(hosts_keys, req)
-          if path_keys.any? { |option| @options[option] }
-            enforce_ssl_for?(path_keys, req)
-          else
-            true
-          end
-        else
-          false
-        end
-      elsif path_keys.any? { |option| @options[option] }
-        enforce_ssl_for?(path_keys, req)
-      else
-        true
+      enforce = false
+      keys_by_type = { 
+        :hosts => [:only_hosts, :except_hosts], :path => [:only, :except], 
+        :methods => [:only_methods, :except_methods] 
+      }
+      
+      if !keys_by_type.values.flatten.compact.any? { |option| @options[option] }
+        return true
       end
+      
+      keys_by_type.keys.each do |type|
+        enforce = enforce_ssl_for?(keys_by_type[type], req)
+        
+        next unless enforce
+        
+        keys_by_type.each do |other_type,keys|
+          next if type == other_type || !keys.any? { |option| @options[option] }
+          
+          enforce = enforce_ssl_for?(keys, req)
+          
+          break unless enforce
+        end
+        
+        break if enforce
+      end
+      
+      enforce   
     end
 
     def replace_scheme(req, scheme)
