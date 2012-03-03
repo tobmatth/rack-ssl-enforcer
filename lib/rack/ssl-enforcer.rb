@@ -85,6 +85,11 @@ module Rack
           req.host == pattern
         when :except_hosts
           req.host != pattern
+        when :only_methods
+          req.env['REQUEST_METHOD'] == pattern
+        when :except_methods
+          req.env['REQUEST_METHOD'] != pattern
+        end
       end
     end
 

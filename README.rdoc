@@ -33,7 +33,7 @@ You might need the :redirect_to option if the requested URL can't be determined 
 
   config.middleware.use Rack::SslEnforcer, :redirect_to => 'https://example.org'
 
-You can also define specific regex patterns or paths or hosts to redirect.
+You can also define specific regex patterns or paths or hosts or methods to redirect.
 
   config.middleware.use Rack::SslEnforcer, :only => /^\/admin\//
   config.middleware.use Rack::SslEnforcer, :only => "/login"
@@ -42,7 +42,11 @@ You can also define specific regex patterns or paths or hosts to redirect.
   config.middleware.use Rack::SslEnforcer, :only_hosts => [/[www|api]\.example\.org$/, 'example.com']
   config.middleware.use Rack::SslEnforcer, :except_hosts => 'help.example.com'
   config.middleware.use Rack::SslEnforcer, :except_hosts => /[help|blog]\.example\.com$/
-
+  config.middleware.use Rack::SslEnforcer, :only_methods => 'POST'
+  config.middleware.use Rack::SslEnforcer, :only_methods => ['POST', 'PUT']
+  config.middleware.use Rack::SslEnforcer, :except_methods => 'GET'
+  config.middleware.use Rack::SslEnforcer, :except_methods => ['GET', 'HEAD']
+  
 Note: hosts options take precedence over the path options. See tests for examples.
 
 Use the :strict option to force http for all requests not matching your :only specification
