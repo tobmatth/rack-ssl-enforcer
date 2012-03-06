@@ -698,6 +698,22 @@ class TestRackSslEnforcer < Test::Unit::TestCase
     end
   end
 
+  context 'that has nil as :only option & :strict = true' do
+    setup { mock_app :only => nil, :strict => true }
+
+    should 'respond with a non-ssl redirect for /users.xml path' do
+      get 'http://www.example.org/foo'
+      assert_equal 301, last_response.status
+      assert_equal 'https://www.example.org/foo', last_response.location
+    end
+
+    should 'respond with no redirect for /users.xml path' do
+      get 'https://www.example.org/users.xml'
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
+    end
+  end
+
   context 'that has array of regex pattern & path as only option with strict option and post option' do
     setup { mock_app :only => [/^\/users\/(.+)\/edit/], :mixed => true }
 
