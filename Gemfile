@@ -3,6 +3,8 @@ source :rubygems
 # Specify your gem's dependencies in rack-ssl-enforcer.gemspec
 gemspec
 
+gem 'rake'
+
 group :guard do
   gem 'guard'
   gem 'guard-test'
