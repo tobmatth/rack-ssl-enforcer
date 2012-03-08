@@ -7,33 +7,26 @@ class SslEnforcerConstraint
 
   def matches?
     if @rule.is_a?(String) && [:only, :except].include?(@name)
-      tested_string[0, @rule.size].send(operator, @rule)
+      result = tested_string[0, @rule.size].send(operator, @rule)
     else
-      tested_string.send(operator, @rule)
+      result = tested_string.send(operator, @rule)
     end
+    
+    negate_result? ? !result : result
   end
 
 private
+  
+  def negate_result?
+    @name.to_s =~ /except/
+  end
 
   def operator
-    "#{operator_prefix}#{operator_suffix}"
-  end
-
-  def operator_prefix
-    case @name
-    when /only/
-      "="
-    when /except/
-      "!"
-    end
-  end
-
-  def operator_suffix
-    @rule.is_a?(Regexp) ? "~" : "="
+    @rule.is_a?(Regexp) ? "=~" : "=="
   end
 
   def tested_string
-    case @name
+    case @name.to_s
     when /hosts/
       @request.host
     when /methods/
