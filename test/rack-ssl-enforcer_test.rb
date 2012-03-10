@@ -109,9 +109,15 @@ class TestRackSslEnforcer < Test::Unit::TestCase
       assert_equal 301, last_response.status
       assert_equal 'https://www.google.com/', last_response.location
     end
-
-    should 'not redirect SSL requests' do
+    
+    should 'redirect SSL requests if hosts do not match' do
       get 'https://www.example.org/'
+      assert_equal 301, last_response.status
+      assert_equal 'https://www.google.com/', last_response.location
+    end
+
+    should 'not redirect SSL requests if hosts match' do
+      get 'https://www.google.com'
       assert_equal 200, last_response.status
       assert_equal 'Hello world!', last_response.body
     end
