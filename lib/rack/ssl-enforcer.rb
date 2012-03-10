@@ -11,7 +11,7 @@ module Rack
     }
 
     # Warning: If you set the option force_secure_cookies to false, make sure that your cookies
-    #  are encoded and that you understand the consequences (see documentation)
+    # are encoded and that you understand the consequences (see documentation)
     def initialize(app, options={})
       default_options = {
         :redirect_to          => nil,
@@ -29,16 +29,14 @@ module Rack
 
     def call(env)
       @request = Rack::Request.new(env)
-      scheme = if enforce_ssl?
+      @scheme = if enforce_ssl?
         'https'
       elsif enforce_non_ssl?
         'http'
       end
 
-      if scheme && scheme != current_scheme
-        location = replace_scheme(@request, scheme)
-        body     = "<html><body>You are being <a href=\"#{location}\">redirected</a>.</body></html>"
-        [301, { 'Content-Type' => 'text/html', 'Location' => location }, [body]]
+      if redirect_required?
+        modify_location_and_redirect
       elsif ssl_request?
         status, headers, body = @app.call(env)
         flag_cookies_as_secure!(headers) if @options[:force_secure_cookies]
@@ -50,13 +48,40 @@ module Rack
     end
 
   private
-
-    def enforce_non_ssl?
-      true if @options[:strict] || @options[:mixed] && !(@request.request_method == 'PUT' || @request.request_method == 'POST')
+  
+    def redirect_required?
+      scheme_mismatch? or host_mismatch?
+    end
+    
+    def scheme_mismatch?
+      @scheme && @scheme != current_scheme
+    end
+    
+    def host_mismatch?
+      destination_host && destination_host != @request.host
+    end
+    
+    def modify_location_and_redirect
+      location = "#{current_scheme}://#{@request.host}#{@request.fullpath}"
+      location = replace_scheme(location, @scheme)
+      location = replace_host(location, @options[:redirect_to])
+      redirect_to(location)
+    end
+    
+    def redirect_to(location)
+      body = "<html><body>You are being <a href=\"#{location}\">redirected</a>.</body></html>"
+      [301, { 'Content-Type' => 'text/html', 'Location' => location }, [body]]
     end
 
     def ssl_request?
       current_scheme == 'https'
+    end
+    
+    def destination_host
+      if @options[:redirect_to]
+        host_parts = URI.split(@options[:redirect_to])
+        host_parts[2] || host_parts[5]
+      end
     end
 
     # Fixed in rack >= 1.3
@@ -84,30 +109,41 @@ module Rack
       end
     end
 
+    def enforce_non_ssl?
+      @options[:strict] || @options[:mixed] && !(@request.request_method == 'PUT' || @request.request_method == 'POST')
+    end
+
     def enforce_ssl?
       CONSTRAINTS_BY_TYPE.inject(true) do |memo, (type, keys)|
         memo && enforce_ssl_for?(keys)
       end
     end
 
-    def replace_scheme(req, scheme)
-      if @options[:redirect_to]
-        uri = URI.split(@options[:redirect_to])
-        uri = uri[2] || uri[5]
-      else
-        uri = nil
-      end
-      host = uri || req.host
-      port = port_for(scheme).to_s
-
-      URI.parse("#{scheme}://#{host}:#{port}#{req.fullpath}").to_s
+    def replace_scheme(uri, scheme)
+      return uri if not scheme_mismatch?
+      
+      port = adjust_port_to(scheme)
+      uri_parts = URI.split(uri)
+      uri_parts[3] = port unless port.nil?
+      uri_parts[0] = scheme
+      URI::HTTP.new(*uri_parts).to_s
     end
-
-    def port_for(scheme)
+    
+    def replace_host(uri, host)
+      return uri unless host_mismatch?
+      
+      host_parts = URI.split(host)
+      new_host = host_parts[2] || host_parts[5]
+      uri_parts = URI.split(uri)
+      uri_parts[2] = new_host
+      URI::HTTPS.new(*uri_parts).to_s
+    end
+    
+    def adjust_port_to(scheme)
       if scheme == 'https'
-        @options[:https_port] || 443
-      else
-        @options[:http_port] || 80
+        @options[:https_port] if @options[:https_port] && @options[:https_port] != URI::HTTPS.default_port
+      elsif scheme == 'http'
+        @options[:http_port] if @options[:http_port] && @options[:http_port] != URI::HTTP.default_port
       end
     end
 
