@@ -15,6 +15,29 @@ Add Rack::SslEnforcer to your `Gemfile`:
  gem 'rack-ssl-enforcer'
 ```
 
+### Installing on Sinatra / Padrino application
+
+In order for Rack::SslEnforcer to properly work it has to be at the top
+of the Rack Middleware.
+
+Using `enable :session` will place Rack::Session::Cookie before Rack::Ssl::Enforcer 
+and will prevent Rack::Ssl::Enforcer from marking cookies as secure.
+
+To fix this issue do not use `enable :sessions` instead add the
+Rack::Session::Cookie middleware after Rack::Ssl::Enforcer.  
+
+Eg:
+
+    use Rack::SslEnforcer 
+    set :session_secret, 'asdfa2342923422f1adc05c837fa234230e3594b93824b00e930ab0fb94b'
+  
+    #Enable sinatra sessions
+    use Rack::Session::Cookie, :key => '_rack_session',
+                               :path => '/',
+                               :expire_after => 2592000, # In seconds
+                               :secret => session_secret
+
+
 ## Basic Usage
 
 If you don't use Bundler, be sure to require Rack::SslEnforcer manually before actually using the middleware:
