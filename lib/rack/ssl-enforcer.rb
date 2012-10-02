@@ -29,6 +29,9 @@ module Rack
 
     def call(env)
       @request = Rack::Request.new(env)
+
+      return @app.call(env) if ignore?
+
       @scheme = if enforce_ssl?
         'https'
       elsif enforce_non_ssl?
@@ -50,7 +53,18 @@ module Rack
   private
   
     def redirect_required?
-      scheme_mismatch? or host_mismatch?
+      scheme_mismatch? || host_mismatch?
+    end
+
+    def ignore?
+      if @options[:ignore]
+        rules = [@options[:ignore]].flatten.compact
+        rules.any? do |rule|
+          SslEnforcerConstraint.new(:ignore, rule, @request).matches?
+        end
+      else
+        false
+      end
     end
     
     def scheme_mismatch?

@@ -275,6 +275,66 @@ class TestRackSslEnforcer < Test::Unit::TestCase
     end
   end
 
+  context ':ignore (Regex)' do
+    setup { mock_app :ignore => /^\/foo/}
+
+    should 'not redirect for http' do
+      get 'http://www.example.org/foo'
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
+    end
+
+    should 'not redirect for https' do
+      get 'https://www.example.org/foo'
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
+    end
+  end
+
+  context ':ignore (String)' do
+    setup { mock_app :ignore => '/foo'}
+
+    should 'not redirect for http' do
+      get 'http://www.example.org/foo'
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
+    end
+
+    should 'not redirect for https' do
+      get 'https://www.example.org/foo'
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
+    end
+  end
+
+  context ':ignore (Array)' do
+    setup { mock_app :ignore => [/^\/foo/,'/bar']}
+
+    should 'not redirect for http for /foo' do
+      get 'http://www.example.org/foo'
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
+    end
+
+    should 'not redirect for https for /foo' do
+      get 'https://www.example.org/foo'
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
+    end
+
+    should 'not redirect for http for /bar' do
+      get 'http://www.example.org/bar'
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
+    end
+
+    should 'not redirect for https for /bar' do
+      get 'https://www.example.org/bar'
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
+    end
+  end
+
   context ':only_hosts (Regex)' do
     setup { mock_app :only_hosts => /[www|api]\.example\.co\.uk$/ }
 
