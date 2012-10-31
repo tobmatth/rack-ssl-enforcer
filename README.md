@@ -57,7 +57,7 @@ If all you want is SSL for your whole application, you are done! Otherwise, you 
 
 ## Options
 
-### Host contraints
+### Host constraints
 
 You can enforce SSL connections only for certain hosts with `:only_hosts`, or prevent certain hosts from being forced to SSL with `:except_hosts`. Constraints can be a `String`, a `Regex` or an array of `String` or `Regex` (possibly mixed), as shown in the following examples:
 
@@ -70,7 +70,7 @@ config.middleware.use Rack::SslEnforcer, :except_hosts => /[help|blog]\.example\
 config.middleware.use Rack::SslEnforcer, :only_hosts => [/[secure|admin]\.example\.org$/, 'api.example.com']
 ```
 
-### Path contraints
+### Path constraints
 
 You can enforce SSL connections only for certain paths with `:only`, or prevent certain paths from being forced to SSL with `:except`. Constraints can be a `String`, a `Regex` or an array of `String` or `Regex` (possibly mixed), as shown in the following examples:
 
@@ -83,7 +83,7 @@ config.middleware.use Rack::SslEnforcer, :only => %r{^/admin/}
 config.middleware.use Rack::SslEnforcer, :except => ['/demo', %r{^/public/}]
 ```
 
-### Method contraints
+### Method constraints
 
 You can enforce SSL connections only for certain HTTP methods with `:only_methods`, or prevent certain HTTP methods from being forced to SSL with `:except_methods`. Constraints can be a `String` or an array of `String`, as shown in the following examples:
 
@@ -109,7 +109,7 @@ config.middleware.use Rack::SslEnforcer, :except_hosts => 'demo.example.com', :s
 # https://demo.example.com would be redirected to http://demo.example.com
 ```
 
-### Automatic method contraints
+### Automatic method constraints
 
 In the case where you have matching URLs with different HTTP methods – for instance Rails RESTful routes: `GET /users`, `POST /users`, `GET /user/:id` and `PUT /user/:id` – you may need to force POST and PUT requests to SSL connection but redirect to non-SSL connection on GET.
 
