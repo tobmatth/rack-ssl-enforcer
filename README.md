@@ -179,6 +179,14 @@ In the `location` block for your app's SSL configuration, include the following 
 
 `proxy_set_header   X-Forwarded-Proto https;`
 
+Or, if you're using mod_rails/passenger (which will ignore the proxy_xxx directives):
+
+`passenger_set_cgi_param HTTP_X_FORWARDED_PROTO https;`
+
+If you're sharing a single `server` block for http AND https access you can add:
+
+`passenger_set_cgi_param HTTP_X_FORWARDED_PROTO $scheme;`
+
 This makes sure that Rack::SslEnforcer knows it's being accessed over SSL. Just restart Nginx for these changes to take effect.
 
 ## TODO
