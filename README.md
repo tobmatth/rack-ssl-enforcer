@@ -179,6 +179,8 @@ In the `location` block for your app's SSL configuration, include the following 
 
 `proxy_set_header   X-Forwarded-Proto https;`
 
+### Passenger
+
 Or, if you're using mod_rails/passenger (which will ignore the proxy_xxx directives):
 
 `passenger_set_cgi_param HTTP_X_FORWARDED_PROTO https;`
