@@ -7,6 +7,7 @@ gem 'rake'
 require 'rbconfig'
 
 group :development do
+  gem 'rdoc'
   gem 'guard'
   gem 'guard-test'
 
