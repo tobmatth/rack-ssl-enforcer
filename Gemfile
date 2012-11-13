@@ -3,13 +3,13 @@ source :rubygems
 gemspec
 
 gem 'rake'
+gem 'guard-test'
 
 require 'rbconfig'
 
 group :development do
   gem 'rdoc'
   gem 'guard'
-  gem 'guard-test'
 
   if RbConfig::CONFIG['target_os'] =~ /darwin/i
     gem 'rb-fsevent', '~> 0.4'
