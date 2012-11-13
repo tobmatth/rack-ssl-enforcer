@@ -23,7 +23,7 @@ end
 
 task :default => :test
 
-require 'rake/rdoctask'
+require 'rdoc/task'
 require 'rack/ssl-enforcer/version'
 RDoc::Task.new do |rdoc|
   version = Rack::SslEnforcer::VERSION
