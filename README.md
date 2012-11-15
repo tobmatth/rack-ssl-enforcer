@@ -72,7 +72,7 @@ config.middleware.use Rack::SslEnforcer, :only_hosts => [/[secure|admin]\.exampl
 
 ### Path constraints
 
-You can enforce SSL connections only for certain paths with `:only`, or prevent certain paths from being forced to SSL with `:except`. Constraints can be a `String`, a `Regex` or an array of `String` or `Regex` (possibly mixed), as shown in the following examples:
+You can enforce SSL connections only for certain paths with `:only`, prevent certain paths from being forced to SSL with `:except`, or - if you don't care how certain paths are accessed - ignore them with `:ignore`. Constraints can be a `String`, a `Regex` or an array of `String` or `Regex` (possibly mixed), as shown in the following examples:
 
 ```ruby
 config.middleware.use Rack::SslEnforcer, :only => '/login'
@@ -81,6 +81,8 @@ config.middleware.use Rack::SslEnforcer, :only => '/login'
 config.middleware.use Rack::SslEnforcer, :only => %r{^/admin/}
 
 config.middleware.use Rack::SslEnforcer, :except => ['/demo', %r{^/public/}]
+
+config.middleware.use Rack::SslEnforcer, :ignore => '/assets'
 ```
 
 ### Method constraints
