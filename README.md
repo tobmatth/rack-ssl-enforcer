@@ -139,6 +139,14 @@ You might need the `:redirect_to` option if the requested URL can't be determine
 config.middleware.use Rack::SslEnforcer, :redirect_to => 'https://example.org'
 ```
 
+### Redirect with specific HTTP status code
+
+By default it redirects with HTTP status code 301(Moved Permanently). Sometimes you might need to redirect with different HTTP status code:
+
+```ruby
+config.middleware.use Rack::SslEnforcer, :redirect_code => 302
+```
+
 ### Custom HTTP port
 
 If you're using a different port than the default (80) for HTTP, you can specify it with the `:http_port` option:
