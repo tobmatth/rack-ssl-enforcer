@@ -109,7 +109,7 @@ class TestRackSslEnforcer < Test::Unit::TestCase
       assert_equal 301, last_response.status
       assert_equal 'https://www.google.com/', last_response.location
     end
-    
+
     should 'redirect SSL requests if hosts do not match' do
       get 'https://www.example.org/'
       assert_equal 301, last_response.status
@@ -779,6 +779,34 @@ class TestRackSslEnforcer < Test::Unit::TestCase
 
     should 'not redirect for GET request' do
       get 'http://www.example.org/'
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
+    end
+  end
+
+  context 'complex example' do
+    setup { mock_app :only => '/cart', :ignore => %r{/assets}, :strict => true }
+
+    should 'redirect to HTTPS for /cart' do
+      get 'http://www.example.org/cart'
+      assert_equal 301, last_response.status
+      assert_equal 'https://www.example.org/cart', last_response.location
+    end
+
+    should 'redirect to HTTP for other paths' do
+      get 'https://www.example.org/foo'
+      assert_equal 301, last_response.status
+      assert_equal 'http://www.example.org/foo', last_response.location
+    end
+
+    should 'leave HTTP as is for /assets' do
+      get 'http://www.example.org/assets'
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
+    end
+
+    should 'leave HTTPS as is for /assets' do
+      get 'https://www.example.org/assets'
       assert_equal 200, last_response.status
       assert_equal 'Hello world!', last_response.body
     end

@@ -51,7 +51,7 @@ module Rack
     end
 
   private
-  
+
     def redirect_required?
       scheme_mismatch? || host_mismatch?
     end
@@ -66,22 +66,22 @@ module Rack
         false
       end
     end
-    
+
     def scheme_mismatch?
       @scheme && @scheme != current_scheme
     end
-    
+
     def host_mismatch?
       destination_host && destination_host != @request.host
     end
-    
+
     def modify_location_and_redirect
       location = "#{current_scheme}://#{@request.host}#{@request.fullpath}"
       location = replace_scheme(location, @scheme)
       location = replace_host(location, @options[:redirect_to])
       redirect_to(location)
     end
-    
+
     def redirect_to(location)
       body = "<html><body>You are being <a href=\"#{location}\">redirected</a>.</body></html>"
       [301, { 'Content-Type' => 'text/html', 'Location' => location }, [body]]
@@ -90,7 +90,7 @@ module Rack
     def ssl_request?
       current_scheme == 'https'
     end
-    
+
     def destination_host
       if @options[:redirect_to]
         host_parts = URI.split(@options[:redirect_to])
@@ -135,24 +135,24 @@ module Rack
 
     def replace_scheme(uri, scheme)
       return uri if not scheme_mismatch?
-      
+
       port = adjust_port_to(scheme)
       uri_parts = URI.split(uri)
       uri_parts[3] = port unless port.nil?
       uri_parts[0] = scheme
       URI::HTTP.new(*uri_parts).to_s
     end
-    
+
     def replace_host(uri, host)
       return uri unless host_mismatch?
-      
+
       host_parts = URI.split(host)
       new_host = host_parts[2] || host_parts[5]
       uri_parts = URI.split(uri)
       uri_parts[2] = new_host
       URI::HTTPS.new(*uri_parts).to_s
     end
-    
+
     def adjust_port_to(scheme)
       if scheme == 'https'
         @options[:https_port] if @options[:https_port] && @options[:https_port] != URI::HTTPS.default_port

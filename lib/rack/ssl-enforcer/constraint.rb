@@ -11,12 +11,12 @@ class SslEnforcerConstraint
     else
       result = tested_string.send(operator, @rule)
     end
-    
+
     negate_result? ? !result : result
   end
 
 private
-  
+
   def negate_result?
     @name.to_s =~ /except/
   end
