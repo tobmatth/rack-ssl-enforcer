@@ -84,6 +84,9 @@ config.middleware.use Rack::SslEnforcer, :only => %r{^/admin/}
 config.middleware.use Rack::SslEnforcer, :except => ['/demo', %r{^/public/}]
 
 config.middleware.use Rack::SslEnforcer, :ignore => '/assets'
+
+# You can also combine multiple constraints
+config.middleware.use Rack::SslEnforcer, :only => '/cart', :ignore => %r{/assets}, :strict => true
 ```
 
 ### Method constraints
