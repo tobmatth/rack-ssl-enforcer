@@ -1,6 +1,17 @@
+# coding: utf-8
 require 'helper'
 
 class TestRackSslEnforcer < Test::Unit::TestCase
+
+  context 'weird URI' do
+    setup { mock_app }
+
+    should 'redirect to HTTPS and keep params' do
+      get URI.encode('http://www.example.org/store/events/539?__utmz=(direct)|whatever')
+      assert_equal 301, last_response.status
+      assert_equal 'https://www.example.org/store/events/539?__utmz=(direct)|whatever', last_response.location
+    end
+  end
 
   context 'no options' do
     setup { mock_app }

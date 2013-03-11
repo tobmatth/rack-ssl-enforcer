@@ -1,4 +1,5 @@
 require 'rack/ssl-enforcer/constraint'
+require 'addressable/uri'
 
 module Rack
 
@@ -76,9 +77,10 @@ module Rack
     end
 
     def modify_location_and_redirect
-      location = "#{current_scheme}://#{@request.host}#{@request.fullpath}"
+      location = Addressable::URI.unencode("#{current_scheme}://#{@request.host}#{@request.fullpath}")
       location = replace_scheme(location, @scheme)
       location = replace_host(location, @options[:redirect_to])
+
       redirect_to(location)
     end
 
@@ -93,8 +95,8 @@ module Rack
 
     def destination_host
       if @options[:redirect_to]
-        host_parts = URI.split(@options[:redirect_to])
-        host_parts[2] || host_parts[5]
+        host = Addressable::URI.parse(@options[:redirect_to])
+        host.host || host.path
       end
     end
 
@@ -133,24 +135,27 @@ module Rack
       end
     end
 
-    def replace_scheme(uri, scheme)
-      return uri if not scheme_mismatch?
+    def replace_scheme(uri_string, scheme)
+      return uri_string if not scheme_mismatch?
 
       port = adjust_port_to(scheme)
-      uri_parts = URI.split(uri)
-      uri_parts[3] = port unless port.nil?
-      uri_parts[0] = scheme
-      URI::HTTP.new(*uri_parts).to_s
+      uri = Addressable::URI.parse(uri_string)
+      uri.port = port unless port.nil?
+      uri.scheme = scheme
+
+      uri.to_s
     end
 
-    def replace_host(uri, host)
-      return uri unless host_mismatch?
+    def replace_host(uri_string, host_string)
+      return uri_string unless host_mismatch?
 
-      host_parts = URI.split(host)
-      new_host = host_parts[2] || host_parts[5]
-      uri_parts = URI.split(uri)
-      uri_parts[2] = new_host
-      URI::HTTPS.new(*uri_parts).to_s
+      host = Addressable::URI.parse(host_string)
+      new_host = host.host || host.path
+
+      uri = Addressable::URI.parse(uri_string)
+      uri.host = new_host
+
+      uri.to_s
     end
 
     def adjust_port_to(scheme)
