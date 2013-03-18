@@ -76,6 +76,7 @@ module Rack
     end
 
     def modify_location_and_redirect
+      @request.session[:flash].keep if !@request.session.nil? && @request.session.key?('flash') && !@request.session['flash'].empty?
       location = "#{current_scheme}://#{@request.host}#{@request.fullpath}"
       location = replace_scheme(location, @scheme)
       location = replace_host(location, @options[:redirect_to])
