@@ -1,4 +1,4 @@
-# Rack::SslEnforcer [![Build Status](https://secure.travis-ci.org/tobmatth/rack-ssl-enforcer.png?branch=master)](http://travis-ci.org/tobmatth/rack-ssl-enforcer)
+# Rack::SslEnforcer [![Build Status](https://travis-ci.org/tobmatth/rack-ssl-enforcer.png?branch=master)](https://travis-ci.org/tobmatth/rack-ssl-enforcer)
 
 Rack::SslEnforcer is a simple Rack middleware to enforce SSL connections. As of Version 0.2.0, Rack::SslEnforcer marks
 Cookies as secure by default (HSTS must be set manually).
@@ -7,7 +7,7 @@ Tested against Ruby 1.8.7, 1.9.2, 1.9.3, ruby-head, REE and the latest versions 
 
 ## Installation
 
-The simplest way to install Rack::SslEnforcer is to use [Bundler](http://gembundler.com/).
+The simplest way to install Rack::SslEnforcer is to use [Bundler](http://gembundler.com).
 
 Add Rack::SslEnforcer to your `Gemfile`:
 
@@ -203,9 +203,9 @@ This makes sure that Rack::SslEnforcer knows it's being accessed over SSL. Just 
 
 ## Contributors
 
-* [Dan Mayer](http://github.com/danmayer)
-* [Rémy Coutable](http://github.com/rymai)
-* [Thibaud Guillaume-Gentil](http://github.com/thibaudgg)
+* [Dan Mayer](https://github.com/danmayer)
+* [Rémy Coutable](https://github.com/rymai)
+* [Thibaud Guillaume-Gentil](https://github.com/thibaudgg)
 * [Paul Annesley](https://github.com/pda)
 * [Saimon Moore](https://github.com/saimonmoore)
 
@@ -223,4 +223,4 @@ Flagging cookies as secure functionality and HSTS support is greatly inspired by
 
 ## Copyright
 
-Copyright (c) 2010-2012 Tobias Matthies. See LICENSE for details.
+Copyright (c) 2010-2013 Tobias Matthies. See [LICENSE](https://github.com/tobmatth/rack-ssl-enforcer/blob/master/LICENSE) for details.
