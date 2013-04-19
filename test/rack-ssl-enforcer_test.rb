@@ -307,6 +307,16 @@ class TestRackSslEnforcer < Test::Unit::TestCase
     end
   end
 
+  context ':ignore (Nested String)' do
+    setup { mock_app :only => '/foo', :ignore => '/foo/bar'}
+
+    should 'not redirect for nested url' do
+      get 'http://www.example.org/foo/bar'
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
+    end
+  end
+
   context ':ignore (Array)' do
     setup { mock_app :ignore => [/^\/foo/,'/bar']}
 
