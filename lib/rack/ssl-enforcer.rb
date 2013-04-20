@@ -15,6 +15,7 @@ module Rack
     def initialize(app, options={})
       default_options = {
         :redirect_to          => nil,
+        :redirect_code        => nil,
         :strict               => false,
         :mixed                => false,
         :hsts                 => nil,
@@ -84,7 +85,7 @@ module Rack
 
     def redirect_to(location)
       body = "<html><body>You are being <a href=\"#{location}\">redirected</a>.</body></html>"
-      [301, { 'Content-Type' => 'text/html', 'Location' => location }, [body]]
+      [@options[:redirect_code] || 301, { 'Content-Type' => 'text/html', 'Location' => location }, [body]]
     end
 
     def ssl_request?
@@ -100,7 +101,7 @@ module Rack
 
     # Fixed in rack >= 1.3
     def current_scheme
-      if @request.env['HTTPS'] == 'on'
+      if @request.env['HTTPS'] == 'on' || @request.env['HTTP_X_SSL_REQUEST'] == 'on'
         'https'
       elsif @request.env['HTTP_X_FORWARDED_PROTO']
         @request.env['HTTP_X_FORWARDED_PROTO'].split(',')[0]

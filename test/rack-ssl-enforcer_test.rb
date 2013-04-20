@@ -123,6 +123,16 @@ class TestRackSslEnforcer < Test::Unit::TestCase
     end
   end
 
+  context ':redirect_code' do
+    setup { mock_app :redirect_code => 302 }
+
+    should 'redirect to HTTPS and keep params' do
+      get 'http://www.example.org/admin/account'
+      assert_equal 302, last_response.status
+      assert_equal 'https://www.example.org/admin/account', last_response.location
+    end
+  end
+
   context ':only (Regex)' do
     setup { mock_app :only => /^\/admin/ }
 
