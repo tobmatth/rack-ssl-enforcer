@@ -171,7 +171,7 @@ module Rack
         end
 
         headers['Set-Cookie'] = cookies.map do |cookie|
-          cookie !~ /(;\s+)?secure($|;)/ ? "#{cookie}; secure" : cookie
+          cookie !~ /(^|;\s)secure($|;)/ ? "#{cookie}; secure" : cookie
         end.join("\n")
       end
     end
