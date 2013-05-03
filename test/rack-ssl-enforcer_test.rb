@@ -804,6 +804,106 @@ class TestRackSslEnforcer < Test::Unit::TestCase
     end
   end
 
+  context ':only_environments (String)' do
+    setup { mock_app :only_environments => 'production' }
+
+    should 'redirect to HTTPS for "production" environment' do
+      ENV["RACK_ENV"] = "production"
+      get 'http://www.example.org/'
+      assert_equal 301, last_response.status
+      assert_equal 'https://www.example.org/', last_response.location
+    end
+
+    should 'not redirect for "development" environment' do
+      ENV["RACK_ENV"] = "development"
+      get 'http://www.example.org/'
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
+    end
+  end
+
+  context ':only_environments (Array + Regex)' do
+    setup { mock_app :only_environments => ['production', /QA\d+/] }
+
+    should 'redirect to HTTPS for "production" environment' do
+      ENV["RACK_ENV"] = "production"
+      get 'http://www.example.org/'
+      assert_equal 301, last_response.status
+      assert_equal 'https://www.example.org/', last_response.location
+    end
+
+    should 'redirect to HTTPS for "QA2" environment' do
+      ENV["RACK_ENV"] = "QA2"
+      get 'http://www.example.org/'
+      assert_equal 301, last_response.status
+      assert_equal 'https://www.example.org/', last_response.location
+    end
+
+    should 'redirect to HTTPS for "QA15" environment' do
+      ENV["RACK_ENV"] = "QA15"
+      get 'http://www.example.org/'
+      assert_equal 301, last_response.status
+      assert_equal 'https://www.example.org/', last_response.location
+    end
+
+    should 'not redirect for "development" environment' do
+      ENV["RACK_ENV"] = "development"
+      get 'http://www.example.org/'
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
+    end
+  end
+
+  context ':except_environments (String)' do
+    setup { mock_app :except_environments => 'development' }
+
+    should 'redirect to HTTPS for "production" environment' do
+      ENV["RACK_ENV"] = "production"
+      get 'http://www.example.org/'
+      assert_equal 301, last_response.status
+      assert_equal 'https://www.example.org/', last_response.location
+    end
+
+    should 'not redirect for "development" environment' do
+      ENV["RACK_ENV"] = "development"
+      get 'http://www.example.org/'
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
+    end
+  end
+
+  context ':except_environments (Array + Regex)' do
+    setup { mock_app :except_environments => ['development', /\w+_local/] }
+
+    should 'redirect to HTTPS for "production" environment' do
+      ENV["RACK_ENV"] = "production"
+      get 'http://www.example.org/'
+      assert_equal 301, last_response.status
+      assert_equal 'https://www.example.org/', last_response.location
+    end
+
+    should 'not redirect for "development" environment' do
+      ENV["RACK_ENV"] = "development"
+      get 'http://www.example.org/'
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
+    end
+
+    should 'not redirect for "jebediah_local" environment' do
+      ENV["RACK_ENV"] = "jebediah_local"
+      get 'http://www.example.org/'
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
+    end
+
+    should 'not redirect for "el_guapo_local" environment' do
+      ENV["RACK_ENV"] = "el_guapo_local"
+      get 'http://www.example.org/'
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
+    end
+  end
+
   context 'complex example' do
     setup { mock_app :only => '/cart', :ignore => %r{/assets}, :strict => true }
 
