@@ -23,7 +23,9 @@ module Rack
         :https_port           => nil,
         :force_secure_cookies => true
       }
-      CONSTRAINTS_BY_TYPE.values.each { |constraint| default_options[constraint] = nil }
+      CONSTRAINTS_BY_TYPE.values.each do |constraints|
+        constraints.each { |constraint| default_options[constraint] = nil }
+      end
 
       @app, @options = app, default_options.merge(options)
     end
