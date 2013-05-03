@@ -20,16 +20,16 @@ Add Rack::SslEnforcer to your `Gemfile`:
 In order for Rack::SslEnforcer to properly work it has to be at the top
 of the Rack Middleware.
 
-Using `enable :session` will place Rack::Session::Cookie before Rack::Ssl::Enforcer 
+Using `enable :session` will place Rack::Session::Cookie before Rack::Ssl::Enforcer
 and will prevent Rack::Ssl::Enforcer from marking cookies as secure.
 
 To fix this issue do not use `enable :sessions` instead add the
-Rack::Session::Cookie middleware after Rack::Ssl::Enforcer.  
+Rack::Session::Cookie middleware after Rack::Ssl::Enforcer.
 
 Eg:
 
 ```ruby
-use Rack::SslEnforcer 
+use Rack::SslEnforcer
 set :session_secret, 'asdfa2342923422f1adc05c837fa234230e3594b93824b00e930ab0fb94b'
 
 #Enable sinatra sessions
@@ -102,6 +102,23 @@ config.middleware.use Rack::SslEnforcer, :except_methods => ['GET', 'HEAD']
 ```
 
 Note: The `:hosts` constraint takes precedence over the `:path` constraint. Please see the tests for examples.
+
+
+### Environment constraints
+
+You can enforce SSL connections only for certain environments with `:only_environments` or prevent certain environments from being forced to SSL with `:except_environments`.
+Environment constraints may be a `String`, a `Regex` or an array of `String` or `Regex` (possibly mixed), as shown in the following examples:
+
+```ruby
+config.middleware.use Rack::SslEnforcer, :except_environments => 'development'
+
+config.middleware.use Rack::SslEnforcer, :except_environments => /^[0-9a-f]+_local$/i
+
+config.middleware.use Rack::SslEnforcer, :only_environments => ['production', /^QA/]
+```
+
+Note: The `:environments` constraint requires one the following environment variables to be set: `RACK_ENV`, `RAILS_ENV`, `ENV`.
+
 
 ### Force-redirection to non-SSL connection if constraint is not matched
 
