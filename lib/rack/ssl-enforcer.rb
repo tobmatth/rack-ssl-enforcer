@@ -5,9 +5,10 @@ module Rack
   class SslEnforcer
 
     CONSTRAINTS_BY_TYPE = {
-      :hosts   => [:only_hosts, :except_hosts],
-      :path    => [:only, :except],
-      :methods => [:only_methods, :except_methods]
+      :hosts        => [:only_hosts, :except_hosts],
+      :path         => [:only, :except],
+      :methods      => [:only_methods, :except_methods],
+      :environments => [:only_environments, :except_environments]
     }
 
     # Warning: If you set the option force_secure_cookies to false, make sure that your cookies
@@ -117,7 +118,7 @@ module Rack
       else
         provided_keys.all? do |key|
           rules = [@options[key]].flatten.compact
-          rules.send([:except_hosts, :except].include?(key) ? :all? : :any?) do |rule|
+          rules.send([:except_hosts, :except_environments, :except].include?(key) ? :all? : :any?) do |rule|
             SslEnforcerConstraint.new(key, rule, @request).matches?
           end
         end

@@ -31,6 +31,8 @@ private
       @request.host
     when /methods/
       @request.request_method
+    when /environments/
+      ENV["RACK_ENV"] || ENV["RAILS_ENV"] || ENV["ENV"]
     else
       @request.path
     end
