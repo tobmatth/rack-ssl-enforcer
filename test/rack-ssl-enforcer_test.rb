@@ -904,6 +904,128 @@ class TestRackSslEnforcer < Test::Unit::TestCase
     end
   end
 
+  context ':only_methods_with_paths' do
+    setup { mock_app :only_methods_with_paths => {
+      [:post, :put] => '/admin',
+      :get => ['/secrets', /users/]
+    } }
+
+    should 'redirect to HTTPS for POST /admin/account' do
+      post 'http://www.example.org/admin/account'
+      assert_equal 301, last_response.status
+      assert_equal 'https://www.example.org/admin/account', last_response.location
+    end
+
+    should 'redirect to HTTPS for PUT /admin/account' do
+      put 'http://www.example.org/admin/account'
+      assert_equal 301, last_response.status
+      assert_equal 'https://www.example.org/admin/account', last_response.location
+    end
+
+    should 'redirect to HTTPS for GET /secrets' do
+      get 'http://www.example.org/secrets'
+      assert_equal 301, last_response.status
+      assert_equal 'https://www.example.org/secrets', last_response.location
+    end
+
+    should 'redirect to HTTPS for GET /foo/users/bar' do
+      get 'http://www.example.org/foo/users/bar'
+      assert_equal 301, last_response.status
+      assert_equal 'https://www.example.org/foo/users/bar', last_response.location
+    end
+
+    should 'not redirect for GET /admin/account' do
+      get 'http://www.example.org/admin/account'
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
+    end
+
+    should 'not redirect for POST /secrets' do
+      post 'http://www.example.org/secrets'
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
+    end
+
+    should 'not redirect for POST /foo/users/bar' do
+      post 'http://www.example.org/foo/users/bar'
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
+    end
+  end
+
+  context ':except_methods_with_paths' do
+    setup { mock_app :except_methods_with_paths => {
+      [:post, :get] => '/public',
+      :get => ['/admin', /users/]
+    } }
+
+    should 'not redirect for POST /public/stuff' do
+      post 'http://www.example.org/public/stuff'
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
+    end
+
+    should 'not redirect for GET /public/stuff' do
+      get 'http://www.example.org/public/stuff'
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
+    end
+
+    should 'not redirect for GET /admin/account' do
+      get 'http://www.example.org/admin/account'
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
+    end
+
+    should 'not redirect for GET /foo/users/bar' do
+      get 'http://www.example.org/foo/users/bar'
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
+    end
+
+    should 'redirect to HTTPS for POST /foobar' do
+      post 'http://www.example.org/foobar'
+      assert_equal 301, last_response.status
+      assert_equal 'https://www.example.org/foobar', last_response.location
+    end
+
+    should 'redirect to HTTPS for GET /foobar' do
+      get 'http://www.example.org/foobar'
+      assert_equal 301, last_response.status
+      assert_equal 'https://www.example.org/foobar', last_response.location
+    end
+  end
+
+  context 'complex example using :only, :only_methods, and :only_methods_with_paths' do
+    setup { mock_app :only => '/admin', :only_methods => 'POST',
+      :only_methods_with_paths => { :get => /secrets/ }
+    }
+
+    should 'redirect to HTTPS for POST /admin/account' do
+      post 'http://www.example.org/admin/account'
+      assert_equal 301, last_response.status
+      assert_equal 'https://www.example.org/admin/account', last_response.location
+    end
+
+    should 'redirect to HTTPS for GET /magical/secrets' do
+      get 'http://www.example.org/magical/secrets'
+      assert_equal 301, last_response.status
+      assert_equal 'https://www.example.org/magical/secrets', last_response.location
+    end
+
+    should 'not redirect for GET /admin/account' do
+      get 'http://www.example.org/admin/account'
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
+    end
+
+    should 'not redirect for POST /magical/secrets' do
+      post 'http://www.example.org/magical/secrets'
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
+    end
+  end
+
   context 'complex example' do
     setup { mock_app :only => '/cart', :ignore => %r{/assets}, :strict => true }
 

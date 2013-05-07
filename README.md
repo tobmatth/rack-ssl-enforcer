@@ -104,6 +104,36 @@ config.middleware.use Rack::SslEnforcer, :except_methods => ['GET', 'HEAD']
 Note: The `:hosts` constraint takes precedence over the `:path` constraint. Please see the tests for examples.
 
 
+### Method + Path combination constraints
+
+You can enforce SSL connections only for certain HTTP method and path combinations with `:only_methods_with_paths`,
+or prevent enforcement of SSL connections for certain HTTP method and path combinations with `:except_methods_with_paths`.
+The combination constraint must be a `Hash` with methods as keys and paths as values.
+Method constraints can be a `Symbol`, a `String` or an array of `Symbol` or `String`.
+Path constraints can be a `String`, a `Regex` or an array of `String` or `Regex`.
+
+Examples:
+
+```ruby
+# Enforce SSL on all requests except HEAD requests to anything under /users or /widgets
+config.middleware.use Rack::SslEnforcer, :except_methods_with_paths => {'HEAD' => ['/users', '/widgets']}
+
+# Enforce SSL only on POST and PUT requests to anything under /admin
+config.middleware.use Rack::SslEnforcer, :only_methods_with_paths => {['POST', 'PUT'] => '/admin'}
+
+# Enforce SSL only on POST, PUT, and PATCH requests to anything under /admin
+# and POST, PUT, and PATCH requests to any path matching `/users/`
+config.middleware.use Rack::SslEnforcer, :only_methods_with_paths => {[:post, :put, :patch] => ['/admin', /users/]}
+
+# Multiple combination constraints... you get the idea
+config.middleware.use Rack::SslEnforcer, :only_methods_with_paths => {
+  :post => ['/admin', /users/],
+  [:put, :patch] => /users/,
+  :get => '/secrets'
+}
+```
+
+
 ### Environment constraints
 
 You can enforce SSL connections only for certain environments with `:only_environments` or prevent certain environments from being forced to SSL with `:except_environments`.

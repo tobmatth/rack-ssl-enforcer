@@ -1,7 +1,7 @@
 class SslEnforcerConstraint
   def initialize(name, rule, request)
     @name    = name
-    @rule    = name =~ /methods$/ && (rule.is_a?(String) || rule.is_a?(Symbol)) ? rule.to_s.upcase : rule
+    @rule    = name.to_s =~ /methods$/ && (rule.is_a?(String) || rule.is_a?(Symbol)) ? rule.to_s.upcase : rule
     @request = request
   end
 
