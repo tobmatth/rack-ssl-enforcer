@@ -5,10 +5,11 @@ module Rack
   class SslEnforcer
 
     CONSTRAINTS_BY_TYPE = {
-      :hosts        => [:only_hosts, :except_hosts],
-      :path         => [:only, :except],
-      :methods      => [:only_methods, :except_methods],
-      :environments => [:only_environments, :except_environments]
+      :hosts              => [:only_hosts, :except_hosts],
+      :path               => [:only, :except],
+      :methods            => [:only_methods, :except_methods],
+      :methods_with_paths => [:only_methods_with_paths, :except_methods_with_paths],
+      :environments       => [:only_environments, :except_environments]
     }
 
     # Warning: If you set the option force_secure_cookies to false, make sure that your cookies
@@ -113,17 +114,63 @@ module Rack
       end
     end
 
-    def enforce_ssl_for?(keys)
-      provided_keys = keys.select { |key| @options[key] }
-      if provided_keys.empty?
-        true
-      else
-        provided_keys.all? do |key|
-          rules = [@options[key]].flatten.compact
-          rules.send([:except_hosts, :except_environments, :except].include?(key) ? :all? : :any?) do |rule|
-            SslEnforcerConstraint.new(key, rule, @request).matches?
+    def enforce_ssl_for?(constraints)
+
+      # Need to divide constraints into the following groups and combine the results as:
+      # (methodpath_combo_matches || methodpath_discrete_matches) && other_discrete_matches
+      methodpath_combo_constraints = constraints.select do |constraint|
+        constraint.to_s =~ /methods_with_paths$/ ? true : false
+      end
+      methodpath_discrete_constraints = constraints.select do |constraint|
+        constraint.to_s =~ /(only$|except$|methods$)/ ? true : false
+      end
+      other_discrete_constraints = constraints.reject do |constraint|
+        constraint.to_s =~ /(only$|except$|methods)/ ? true : false
+      end
+
+      # For methodpath_combo_constraints, match method and path rules separately, then combine the results.
+      methodpath_combo_matches = methodpath_combo_constraints.any? do |constraint|
+        constraint_type = constraint.to_s[0, constraint.to_s.index('_') || constraint.to_s.length]
+
+        @options[constraint].send(constraint_type == 'except' ? :all? : :any?) do |method_rules, path_rules|
+
+          method_rules = [method_rules].flatten.compact
+          method_constraint = "#{constraint_type}_methods".to_sym
+          method_matches = method_rules.send(constraint_type == 'except' ? :all? : :any?) do |method_rule|
+            SslEnforcerConstraint.new(method_constraint, method_rule, @request).matches?
+          end
+
+          path_rules = [path_rules].flatten.compact
+          path_constraint = constraint_type.to_sym
+          path_matches = path_rules.send(constraint_type == 'except' ? :all? : :any?) do |path_rule|
+            SslEnforcerConstraint.new(path_constraint, path_rule, @request).matches?
+          end
+
+          constraint_type == 'except' ? method_matches || path_matches : method_matches && path_matches
+        end
+      end
+
+      # Use the same logic for both methodpath_discrete_constraints and other_discrete_constraints.
+      matches = []
+      [methodpath_discrete_constraints, other_discrete_constraints].each do |discrete_constraints|
+        matches << discrete_constraints.all? do |constraint|
+          constraint_type = constraint.to_s[0, constraint.to_s.index('_') || constraint.to_s.length]
+
+          rules = [@options[constraint]].flatten.compact
+          rules.send(constraint_type == 'except' ? :all? : :any?) do |rule|
+            SslEnforcerConstraint.new(constraint, rule, @request).matches?
           end
         end
+      end
+      methodpath_discrete_matches, other_discrete_matches = matches
+
+      # Bring it all together.
+      if methodpath_combo_constraints.empty?
+        methodpath_discrete_matches && other_discrete_matches
+      elsif methodpath_discrete_constraints.empty?
+        methodpath_combo_matches && other_discrete_matches
+      else
+        (methodpath_combo_matches || methodpath_discrete_matches) && other_discrete_matches
       end
     end
 
@@ -132,8 +179,12 @@ module Rack
     end
 
     def enforce_ssl?
-      CONSTRAINTS_BY_TYPE.inject(true) do |memo, (type, keys)|
-        memo && enforce_ssl_for?(keys)
+      all_constraints = CONSTRAINTS_BY_TYPE.values.flatten
+      provided_constraints = all_constraints.select { |constraint| @options[constraint] }
+      if provided_constraints.empty?
+        true
+      else
+        enforce_ssl_for?(provided_constraints)
       end
     end
 

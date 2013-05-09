@@ -1,7 +1,7 @@
 class SslEnforcerConstraint
   def initialize(name, rule, request)
     @name    = name
-    @rule    = rule
+    @rule    = name.to_s =~ /methods$/ && (rule.is_a?(String) || rule.is_a?(Symbol)) ? rule.to_s.upcase : rule
     @request = request
   end
 
@@ -18,7 +18,7 @@ class SslEnforcerConstraint
 private
 
   def negate_result?
-    @name.to_s =~ /except/
+    @name.to_s =~ /^except/
   end
 
   def operator
@@ -27,11 +27,11 @@ private
 
   def tested_string
     case @name.to_s
-    when /hosts/
+    when /hosts$/
       @request.host
-    when /methods/
+    when /methods$/
       @request.request_method
-    when /environments/
+    when /environments$/
       ENV["RACK_ENV"] || ENV["RAILS_ENV"] || ENV["ENV"]
     else
       @request.path
