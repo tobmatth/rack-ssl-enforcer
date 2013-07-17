@@ -124,12 +124,6 @@ class TestRackSslEnforcer < Test::Unit::TestCase
   end
 
   context ":before_redirect" do
-    def assert_before_redirect_was_called
-      assert @before_redirect_called, "before_redirect was not called"
-    end
-    def assert_before_redirect_not_called
-      refute @before_redirect_called, "before_redirect was called"
-    end
     def self.startup
       @before_redirect_called = false
     end
@@ -138,11 +132,11 @@ class TestRackSslEnforcer < Test::Unit::TestCase
     }}
     should "call before_direct when redirecting" do
       get 'http://www.google.com/'
-      assert_before_redirect_was_called
+      assert @before_redirect_called, "before_redirect was not called"
     end
     should "not call before_direct when not redirecting" do
       get 'https://www.google.com/'
-      assert_before_redirect_not_called
+      refute @before_redirect_called, "before_redirect was called"
     end
   end
 
