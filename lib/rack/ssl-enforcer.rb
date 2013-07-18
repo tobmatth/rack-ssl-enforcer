@@ -44,7 +44,7 @@ module Rack
       end
 
       if redirect_required?
-        call_before_redirect @options[:before_redirect]
+        call_before_redirect
         modify_location_and_redirect 
       elsif ssl_request?
         status, headers, body = @app.call(env)
@@ -81,8 +81,8 @@ module Rack
       destination_host && destination_host != @request.host
     end
 
-    def call_before_redirect(before_redirect)
-      before_redirect.call unless before_redirect.nil?
+    def call_before_redirect
+       @options[:before_redirect].call unless @options[:before_redirect].nil?
     end
 
     def modify_location_and_redirect
