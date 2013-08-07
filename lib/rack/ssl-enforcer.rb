@@ -6,6 +6,7 @@ module Rack
 
     CONSTRAINTS_BY_TYPE = {
       :hosts        => [:only_hosts, :except_hosts],
+      :agents       => [:only_agents, :except_agents],
       :path         => [:only, :except],
       :methods      => [:only_methods, :except_methods],
       :environments => [:only_environments, :except_environments]
@@ -120,7 +121,7 @@ module Rack
       else
         provided_keys.all? do |key|
           rules = [@options[key]].flatten.compact
-          rules.send([:except_hosts, :except_environments, :except].include?(key) ? :all? : :any?) do |rule|
+          rules.send([:except_hosts, :except_agents, :except_environments, :except].include?(key) ? :all? : :any?) do |rule|
             SslEnforcerConstraint.new(key, rule, @request).matches?
           end
         end
