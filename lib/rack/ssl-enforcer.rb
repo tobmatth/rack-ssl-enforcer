@@ -23,7 +23,8 @@ module Rack
         :hsts                 => nil,
         :http_port            => nil,
         :https_port           => nil,
-        :force_secure_cookies => true
+        :force_secure_cookies => true,
+        :before_redirect      => nil
       }
       CONSTRAINTS_BY_TYPE.values.each do |constraints|
         constraints.each { |constraint| default_options[constraint] = nil }
@@ -44,7 +45,8 @@ module Rack
       end
 
       if redirect_required?
-        modify_location_and_redirect
+        call_before_redirect
+        modify_location_and_redirect 
       elsif ssl_request?
         status, headers, body = @app.call(env)
         flag_cookies_as_secure!(headers) if @options[:force_secure_cookies]
@@ -78,6 +80,10 @@ module Rack
 
     def host_mismatch?
       destination_host && destination_host != @request.host
+    end
+
+    def call_before_redirect
+       @options[:before_redirect].call unless @options[:before_redirect].nil?
     end
 
     def modify_location_and_redirect

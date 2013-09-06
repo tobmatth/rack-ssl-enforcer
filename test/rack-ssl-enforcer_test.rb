@@ -123,6 +123,23 @@ class TestRackSslEnforcer < Test::Unit::TestCase
     end
   end
 
+  context ":before_redirect" do
+    def self.startup
+      @before_redirect_called = false
+    end
+    setup { mock_app :redirect_to => 'https://www.google.com', :before_redirect => Proc.new {
+      @before_redirect_called = true
+    }}
+    should "call before_direct when redirecting" do
+      get 'http://www.google.com/'
+      assert @before_redirect_called, "before_redirect was not called"
+    end
+    should "not call before_direct when not redirecting" do
+      get 'https://www.google.com/'
+      refute @before_redirect_called, "before_redirect was called"
+    end
+  end
+
   context ':redirect_code' do
     setup { mock_app :redirect_code => 302 }
 
