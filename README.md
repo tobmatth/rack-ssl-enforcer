@@ -251,14 +251,9 @@ This makes sure that Rack::SslEnforcer knows it's being accessed over SSL. Just 
 
 * Cleanup tests
 
-## Contributors
+#### Contributors
 
-* [Dan Mayer](https://github.com/danmayer)
-* [Rémy Coutable](https://github.com/rymai)
-* [Thibaud Guillaume-Gentil](https://github.com/thibaudgg)
-* [Paul Annesley](https://github.com/pda)
-* [Saimon Moore](https://github.com/saimonmoore)
-* [Chris Armstrong](https://github.com/thegingeneer)
+[https://github.com/tobmatth/rack-ssl-enforcer/graphs/contributors](https://github.com/tobmatth/rack-ssl-enforcer/graphs/contributors)
 
 ## Credits
 
