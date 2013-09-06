@@ -119,6 +119,18 @@ config.middleware.use Rack::SslEnforcer, :only_environments => ['production', /^
 
 Note: The `:environments` constraint requires one the following environment variables to be set: `RACK_ENV`, `RAILS_ENV`, `ENV`.
 
+### User agent constraints
+
+You can enforce SSL connections only for certain user agents with `:only_agents` or prevent certain user agents from being forced to SSL with `:except_agents`.
+User agent constraints may be a `String`, a `Regex` or an array of `String` or `Regex` (possibly mixed), as shown in the following examples:
+
+```ruby
+config.middleware.use Rack::SslEnforcer, :except_agents => 'Googlebot'
+
+config.middleware.use Rack::SslEnforcer, :except_agents => /[Googlebot|bingbot]/
+
+config.middleware.use Rack::SslEnforcer, :only_agents => ['test-secu-bot', /custom-crawler[0-9a-f]/]
+```
 
 ### Force-redirection to non-SSL connection if constraint is not matched
 
@@ -233,6 +245,7 @@ This makes sure that Rack::SslEnforcer knows it's being accessed over SSL. Just 
 * [Thibaud Guillaume-Gentil](https://github.com/thibaudgg)
 * [Paul Annesley](https://github.com/pda)
 * [Saimon Moore](https://github.com/saimonmoore)
+* [Chris Armstrong](https://github.com/thegingeneer)
 
 ## Credits
 

@@ -33,6 +33,8 @@ private
       @request.request_method
     when /environments/
       ENV["RACK_ENV"] || ENV["RAILS_ENV"] || ENV["ENV"]
+    when /agents/
+      @request.user_agent
     else
       @request.path
     end
