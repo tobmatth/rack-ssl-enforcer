@@ -210,6 +210,19 @@ config.middleware.use Rack::SslEnforcer, :only => "/login", :force_secure_cookie
 But be aware that if you do so, you have to make sure that the content of you cookie is encoded.
 This can be done using a coder with [Rack::Session::Cookie](https://github.com/rack/rack/blob/master/lib/rack/session/cookie.rb#L28-42).
 
+### Running code before redirect
+
+You may want to run some code before rack-ssl-enforcer forces a redirect.  This code could do something like log that a redirect was done, or if this is used in a Rails app, keeping the flash when redirecting:
+
+
+```ruby
+config.middleware.use Rack::SslEnforcer, :only => '/login', :before_redirect => Proc.new {
+  #keep flash on redirect
+  @request.session[:flash].keep if !@request.session.nil? && @request.session.key?('flash') && !@request.session['flash'].empty?
+}
+```
+
+
 ## Deployment
 
 If you run your application behind a proxy (e.g. Nginx) you may need to do some configuration on that side. If you don't you may experience an infinite redirect loop.
