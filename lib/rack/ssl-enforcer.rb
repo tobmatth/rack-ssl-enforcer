@@ -24,6 +24,7 @@ module Rack
         :http_port            => nil,
         :https_port           => nil,
         :force_secure_cookies => true,
+        :redirect_html        => nil,
         :before_redirect      => nil
       }
       CONSTRAINTS_BY_TYPE.values.each do |constraints|
@@ -94,8 +95,12 @@ module Rack
     end
 
     def redirect_to(location)
-      body = "<html><body>You are being <a href=\"#{location}\">redirected</a>.</body></html>"
-      [@options[:redirect_code] || 301, { 'Content-Type' => 'text/html', 'Location' => location }, [body]]
+      body = []
+      body << "<html><body>You are being <a href=\"#{location}\">redirected</a>.</body></html>" if @options[:redirect_html].nil?
+      body << @options[:redirect_html] if @options[:redirect_html].is_a?(String)
+      body = @options[:redirect_html] if @options[:redirect_html].respond_to?('each')
+
+      [@options[:redirect_code] || 301, { 'Content-Type' => 'text/html', 'Location' => location }, body]
     end
 
     def ssl_request?
