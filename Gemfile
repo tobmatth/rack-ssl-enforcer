@@ -28,7 +28,7 @@ end
 # installed on Travis CI
 #
 group :test do
-  gem 'rack-test', '~> 0.5.4'
-  gem 'test-unit', '~> 2.3'
-  gem 'shoulda',   '~> 2.11.3'
+  gem 'rack-test'
+  gem 'test-unit'
+  gem 'shoulda'
 end

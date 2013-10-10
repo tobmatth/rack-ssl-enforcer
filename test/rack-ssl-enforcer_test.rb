@@ -949,4 +949,43 @@ class TestRackSslEnforcer < Test::Unit::TestCase
     end
   end
 
+  context 'complex example with multiple statements' do
+    setup {
+      mock_app([
+        { :only_hosts => %r{api.example.org} },
+        { :except_hosts => %r{api.example.com}, :only => %r{^/users}, :ignore => %r{^/assets}, :strict => true }
+      ])
+    }
+
+    should 'redirect to HTTPS for http://api.example.org' do
+      get 'http://api.example.org'
+      assert_equal 301, last_response.status
+      assert_equal 'https://api.example.org/', last_response.location
+    end
+
+    should 'redirect to HTTPS for http://example.org/users/foo' do
+      get 'http://www.example.org/users/foo'
+      assert_equal 301, last_response.status
+      assert_equal 'https://www.example.org/users/foo', last_response.location
+    end
+
+    should 'leave HTTP as is for /assets' do
+      get 'http://www.example.org/assets'
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
+    end
+
+    should 'leave HTTPS as is for /assets' do
+      get 'https://www.example.org/assets'
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
+    end
+
+    should 'redirect to HTTP for other paths' do
+      get 'https://www.example.org/foo'
+      assert_equal 301, last_response.status
+      assert_equal 'http://www.example.org/foo', last_response.location
+    end
+  end
+
 end
