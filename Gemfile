@@ -8,19 +8,7 @@ gem 'rake'
 # installed on Travis CI.
 #
 group :development do
-  require 'rbconfig'
-
-  if RbConfig::CONFIG['target_os'] =~ /darwin/i
-    gem 'ruby_gntp', :require => false
-
-  elsif RbConfig::CONFIG['target_os'] =~ /linux/i
-    gem 'libnotify',  '~> 0.8.0', :require => false
-
-  elsif RbConfig::CONFIG['target_os'] =~ /mswin|mingw/i
-    gem 'win32console', :require => false
-    gem 'rb-notifu', '>= 0.0.4', :require => false
-  end
-
+  gem 'ruby_gntp', :require => false
   gem 'guard-test'
 end
 
@@ -30,5 +18,5 @@ end
 group :test do
   gem 'rack-test'
   gem 'test-unit'
-  gem 'shoulda'
+  gem 'shoulda', '~> 2.11.3'
 end
