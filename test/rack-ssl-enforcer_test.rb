@@ -953,7 +953,7 @@ class TestRackSslEnforcer < Test::Unit::TestCase
     setup {
       mock_app([
         { :only_hosts => %r{api.example.org} },
-        { :except_hosts => %r{api.example.com}, :only => %r{^/users}, :ignore => %r{^/assets}, :strict => true }
+        { :only => %r{^/users}, :ignore => %r{^/assets}, :strict => true }
       ])
     }
 
