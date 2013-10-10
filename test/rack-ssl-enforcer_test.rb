@@ -175,10 +175,10 @@ class TestRackSslEnforcer < Test::Unit::TestCase
       assert_equal 'https://www.example.org/account', last_response.location
     end
 
-    should 'redirect to HTTPS for /account/public' do
+    should 'not redirect for /account/public' do
       get 'http://www.example.org/account/public'
-      assert_equal 301, last_response.status
-      assert_equal 'https://www.example.org/account/public', last_response.location
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
     end
 
     should 'not redirect SSL requests for /account' do
@@ -189,6 +189,22 @@ class TestRackSslEnforcer < Test::Unit::TestCase
 
     should 'not redirect for /foo' do
       get 'http://www.example.org/foo'
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
+    end
+  end
+
+  context ':only (String) of 1 char' do
+    setup { mock_app :only => "/" }
+
+    should 'redirect to HTTPS for /' do
+      get 'http://www.example.org/'
+      assert_equal 301, last_response.status
+      assert_equal 'https://www.example.org/', last_response.location
+    end
+
+    should 'not redirect for /account' do
+      get 'http://www.example.org/account'
       assert_equal 200, last_response.status
       assert_equal 'Hello world!', last_response.body
     end
