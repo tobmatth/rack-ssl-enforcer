@@ -222,6 +222,31 @@ config.middleware.use Rack::SslEnforcer, :only => '/login', :before_redirect => 
 }
 ```
 
+### Custom or empty response body
+
+The default response body is:
+
+```html
+<html><body>You are being <a href="https://www.example.org/">redirected</a>.</body></html>
+```
+
+To supply a custom message, provide a string as `:redirect_html`:
+
+```ruby
+config.middleware.use Rack::SslEnforcer, :redirect_html => 'Redirecting!'
+```
+
+To supply a series of responses for Rack to chunk, provide a [permissable Rack body object](http://rack.rubyforge.org/doc/SPEC.html):
+
+```ruby
+config.middleware.use Rack::SslEnforcer, :redirect_html => ['<html>','<body>','Hello!','</body>','</html>']
+```
+
+To supply an empty response body, provide :redirect_html as false:
+
+```ruby
+config.middleware.use Rack::SslEnforcer, :redirect_html => false
+```
 
 ## Deployment
 
