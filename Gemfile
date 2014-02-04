@@ -20,3 +20,9 @@ group :test do
   gem 'test-unit'
   gem 'shoulda', '~> 2.11.3'
 end
+
+platforms :rbx do
+  gem 'racc'
+  gem 'rubysl', '~> 2.0'
+  gem 'psych'
+end
