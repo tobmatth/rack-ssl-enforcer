@@ -988,6 +988,15 @@ class TestRackSslEnforcer < Test::Unit::TestCase
     end
   end
 
+  context 'complex host rule example (issue 62)' do
+    setup { mock_app [{:only_hosts => %r{api.example.org}}, {:except_hosts => %r{api.example.org}, :only => %r{^/users}, :ignore => %r{^/assets}, :strict => true}] }
+    should 'stay on HTTPS for https://api.example.org' do
+      get 'https://api.example.org'
+      assert_equal 200, last_response.status
+      assert_equal 'Hello world!', last_response.body
+    end
+  end
+
   context 'default output' do
     setup { mock_app }
 

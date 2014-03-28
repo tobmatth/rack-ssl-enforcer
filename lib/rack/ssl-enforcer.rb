@@ -37,7 +37,9 @@ module Rack
     def call(env)
       @request = Rack::Request.new(env)
 
-      return @app.call(env) if ignore?
+      if ignore? or except?
+        return @app.call(env) 
+      end
 
       @scheme = if enforce_ssl?
         'https'
@@ -73,6 +75,13 @@ module Rack
       else
         false
       end
+    end
+
+    def except?
+      rules = @options.select {|k,v| [:except_hosts, :except_agents, :except_environments, :except].include?(k) && v}                                                                          
+      result = rules.any? do |k, v|
+        !SslEnforcerConstraint.new(k, v, @request).matches?
+      end    
     end
 
     def scheme_mismatch?
