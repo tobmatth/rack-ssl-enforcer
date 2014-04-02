@@ -216,9 +216,9 @@ You may want to run some code before rack-ssl-enforcer forces a redirect.  This 
 
 
 ```ruby
-config.middleware.use Rack::SslEnforcer, :only => '/login', :before_redirect => Proc.new {
+config.middleware.use Rack::SslEnforcer, :only => '/login', :before_redirect => Proc.new { |request|
   #keep flash on redirect
-  @request.session[:flash].keep if !@request.session.nil? && @request.session.key?('flash') && !@request.session['flash'].empty?
+  request.session[:flash].keep if !request.session.nil? && request.session.key?('flash') && !request.session['flash'].empty?
 }
 ```
 

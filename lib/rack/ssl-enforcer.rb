@@ -84,7 +84,7 @@ module Rack
     end
 
     def call_before_redirect
-       @options[:before_redirect].call unless @options[:before_redirect].nil?
+       @options[:before_redirect].call(@request) unless @options[:before_redirect].nil?
     end
 
     def modify_location_and_redirect
