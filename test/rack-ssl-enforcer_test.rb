@@ -344,6 +344,28 @@ class TestRackSslEnforcer < Test::Unit::TestCase
     end
   end
 
+  context ':ignore (block)' do
+    context 'when the block returns truthy' do
+      setup { mock_app :ignore => lambda { |request| true } }
+
+      should 'not redirect' do
+        get 'http://www.example.org/foo/bar'
+        assert_equal 200, last_response.status
+        assert_equal 'Hello world!', last_response.body
+      end
+    end
+
+    context 'when the block returns falsy' do
+      setup { mock_app :ignore => lambda { |request| false } }
+
+      should 'redirect' do
+        get 'http://www.example.org/foo/bar'
+        assert_equal 301, last_response.status
+        assert_equal 'https://www.example.org/foo/bar', last_response.location
+      end
+    end
+  end
+
   context ':ignore (Array)' do
     setup { mock_app :ignore => [/^\/foo/,'/bar']}
 
