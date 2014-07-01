@@ -87,6 +87,9 @@ config.middleware.use Rack::SslEnforcer, :ignore => '/assets'
 
 # You can also combine multiple constraints
 config.middleware.use Rack::SslEnforcer, :only => '/cart', :ignore => %r{/assets}, :strict => true
+
+# And ignore based on blocks
+config.middleware.use Rack::SslEnforcer, :ignore => lambda { |request| request.env["HTTP_X_IGNORE_SSL_ENFORCEMENT"] == "magic" }
 ```
 
 ### Method constraints
