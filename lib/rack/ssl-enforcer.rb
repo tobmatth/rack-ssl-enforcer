@@ -109,7 +109,7 @@ module Rack
 
     def destination_host
       if @options[:redirect_to]
-        host_parts = URI.split(URI.encode(@options[:redirect_to]))
+        host_parts = URI.split(@options[:redirect_to])
         host_parts[2] || host_parts[5]
       end
     end
@@ -153,7 +153,7 @@ module Rack
       return uri if not scheme_mismatch?
 
       port = adjust_port_to(scheme)
-      uri_parts = URI.split(URI.encode(uri))
+      uri_parts = URI.split(uri)
       uri_parts[3] = port unless port.nil?
       uri_parts[0] = scheme
       URI::HTTP.new(*uri_parts).to_s
@@ -162,9 +162,9 @@ module Rack
     def replace_host(uri, host)
       return uri unless host_mismatch?
 
-      host_parts = URI.split(URI.encode(host))
+      host_parts = URI.split(host)
       new_host = host_parts[2] || host_parts[5]
-      uri_parts = URI.split(URI.encode(uri))
+      uri_parts = URI.split(uri)
       uri_parts[2] = new_host
       URI::HTTPS.new(*uri_parts).to_s
     end
