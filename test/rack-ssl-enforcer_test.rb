@@ -103,9 +103,9 @@ class TestRackSslEnforcer < Test::Unit::TestCase
     end
 
     should 'redirect to HTTPS and not re-encode the params' do
-      get 'http://www.example.org/admin?email=someone%40somedomain.com&link=http%3A%2F%2Fwww.someurl.com'
+      get 'http://www.example.org/admin?email=someone%40somedomain.com'
       assert_equal 301, last_response.status
-      assert_equal 'https://www.google.com/admin?email=someone%40somedomain.com&link=http%3A%2F%2Fwww.someurl.com', last_response.location
+      assert_equal 'https://www.google.com/admin?email=someone%40somedomain.com', last_response.location
     end
 
     should 'redirect to HTTPS and append scheme automatically' do
