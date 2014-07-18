@@ -102,6 +102,12 @@ class TestRackSslEnforcer < Test::Unit::TestCase
       assert_equal 'https://www.google.com/admin?token=33', last_response.location
     end
 
+    should 'redirect to HTTPS and not re-encode the params' do
+      get 'http://www.example.org/admin?email=someone%40somedomain.com&link=http%3A%2F%2Fwww.someurl.com'
+      assert_equal 301, last_response.status
+      assert_equal 'https://www.google.com/admin?email=someone%40somedomain.com&link=http%3A%2F%2Fwww.someurl.com', last_response.location
+    end
+
     should 'redirect to HTTPS and append scheme automatically' do
       mock_app :redirect_to => 'www.google.com'
 
@@ -341,6 +347,28 @@ class TestRackSslEnforcer < Test::Unit::TestCase
       get 'http://www.example.org/foo/bar'
       assert_equal 200, last_response.status
       assert_equal 'Hello world!', last_response.body
+    end
+  end
+
+  context ':ignore (block)' do
+    context 'when the block returns truthy' do
+      setup { mock_app :ignore => lambda { |request| true } }
+
+      should 'not redirect' do
+        get 'http://www.example.org/foo/bar'
+        assert_equal 200, last_response.status
+        assert_equal 'Hello world!', last_response.body
+      end
+    end
+
+    context 'when the block returns falsy' do
+      setup { mock_app :ignore => lambda { |request| false } }
+
+      should 'redirect' do
+        get 'http://www.example.org/foo/bar'
+        assert_equal 301, last_response.status
+        assert_equal 'https://www.example.org/foo/bar', last_response.location
+      end
     end
   end
 

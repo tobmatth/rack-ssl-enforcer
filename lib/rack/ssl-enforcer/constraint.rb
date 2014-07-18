@@ -8,6 +8,8 @@ class SslEnforcerConstraint
   def matches?
     if @rule.is_a?(String) && [:only, :except].include?(@name)
       result = tested_string[0, @rule.size].send(operator, @rule)
+    elsif @rule.respond_to?(:call)
+      result = @rule.call(@request)
     else
       result = tested_string.send(operator, @rule)
     end
