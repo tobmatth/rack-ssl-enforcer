@@ -119,7 +119,7 @@ module Rack
       if @request.env['HTTPS'] == 'on' || @request.env['HTTP_X_SSL_REQUEST'] == 'on'
         'https'
       elsif @request.env['HTTP_X_FORWARDED_PROTO']
-        @request.env['HTTP_X_FORWARDED_PROTO'].split(',')[0]
+        @request.env['HTTP_X_FORWARDED_PROTO'].split(',')[0] || @request.scheme
       else
         @request.scheme
       end

@@ -18,6 +18,12 @@ class TestRackSslEnforcer < Test::Unit::TestCase
       assert_equal 'https://www.example.org/', last_response.location
     end
 
+    should 'respect rack.url_scheme header for proxied SSL when HTTP_X_FORWARDED_PROTO blank' do
+      get 'http://www.example.org/', {}, { 'HTTP_X_FORWARDED_PROTO' => '', 'rack.url_scheme' => 'http' }
+      assert_equal 301, last_response.status
+      assert_equal 'https://www.example.org/', last_response.location
+    end
+
     should 'not redirect SSL requests' do
       get 'https://www.example.org/'
       assert_equal 200, last_response.status
