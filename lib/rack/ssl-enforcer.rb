@@ -92,6 +92,8 @@ module Rack
       location = replace_scheme(location, @scheme)
       location = replace_host(location, @options[:redirect_to])
       redirect_to(location)
+    rescue URI::InvalidURIError
+      [400, { 'Content-Type' => 'text/plain'}, []]
     end
 
     def redirect_to(location)

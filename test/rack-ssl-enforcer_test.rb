@@ -1061,4 +1061,12 @@ class TestRackSslEnforcer < Test::Unit::TestCase
       assert_equal last_response.body, '<html><body>Hello!</body></html>'
     end
   end
+  
+  context 'invalid urls' do
+    should 'return HTTP 400 for invalid URIs' do
+      response    = Rack::SslEnforcer.new(nil).call('PATH_INFO' => 'http://www.example.org/<lan')
+      status_code = response.first
+      assert_equal status_code, 400
+    end
+  end
 end
