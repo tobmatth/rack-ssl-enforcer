@@ -1044,7 +1044,8 @@ class TestRackSslEnforcer < Test::Unit::TestCase
 
   context 'custom string output' do
     setup { mock_app :redirect_html => "<html><body>Hello!</body></html>" }
-      should 'produce custom output when redirecting' do
+    
+    should 'produce custom output when redirecting' do
       get 'http://www.example.org/'
       assert_equal 301, last_response.status
       assert_equal last_response.body, '<html><body>Hello!</body></html>'
@@ -1053,7 +1054,8 @@ class TestRackSslEnforcer < Test::Unit::TestCase
 
   context 'custom object output' do
     setup { mock_app :redirect_html => ['<html>','<body>','Hello!','</body>','</html>'] }
-      should 'produce custom output when redirecting' do
+    
+    should 'produce custom output when redirecting' do
       get 'http://www.example.org/'
       assert_equal 301, last_response.status
       assert_equal last_response.body, '<html><body>Hello!</body></html>'
