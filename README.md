@@ -263,6 +263,25 @@ In the `location` block for your app's SSL configuration, include the following 
 
 `proxy_set_header   X-Forwarded-Proto https;`
 
+### Nginx behind Load Balancer
+
+The following instruction has been tested behind AWS ELB, but can be adapted to work behind any load balancer.
+Specifically, the options below account for termination of SSL at the load balancer (HTTP only communication between load balancer and server), and HTTP only health checks.
+
+In the `location` block for your app's SSL configuration, reference the following proxy header configurations:
+
+`proxy_set_header X-Forwarded-Proto $scheme;` & `proxy_redirect off;` & `proxy_set_header Host $http_host;` & `proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;`
+
+In `config/application.rb` for Rails 3 and above, `config/environment.rb` for Rails 2, work off the following line:
+
+```ruby
+config.middleware.use Rack::SslEnforcer, ignore: lambda { |request| request.env["HTTP_X_FORWARDED_PROTO"].blank? }, strict: true
+```
+
+This ignores ELB healthchecks and development environment as ELB healthchecks aren't forwarded requests, so it wouldn't have the forwarded proto header.
+
+Same goes for when running without a proxy (like developemnt locally), making `:except_environments => 'development'` unecessary.
+
 ### Passenger
 
 Or, if you're using mod_rails/passenger (which will ignore the proxy_xxx directives):
