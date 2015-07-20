@@ -47,7 +47,7 @@ module Rack
 
       if redirect_required?
         call_before_redirect
-        modify_location_and_redirect 
+        modify_location_and_redirect
       elsif ssl_request?
         status, headers, body = @app.call(env)
         flag_cookies_as_secure!(headers) if @options[:force_secure_cookies]
@@ -195,10 +195,11 @@ module Rack
 
     # see http://en.wikipedia.org/wiki/Strict_Transport_Security
     def set_hsts_headers!(headers)
-      opts = { :expires => 31536000, :subdomains => true }
+      opts = { :expires => 31536000, :subdomains => true, :preload => false }
       opts.merge!(@options[:hsts]) if @options[:hsts].is_a? Hash
       value  = "max-age=#{opts[:expires]}"
       value += "; includeSubDomains" if opts[:subdomains]
+      value += "; preload" if opts[:preload]
       headers.merge!({ 'Strict-Transport-Security' => value })
     end
 
