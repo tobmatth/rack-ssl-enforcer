@@ -789,16 +789,21 @@ class TestRackSslEnforcer < Test::Unit::TestCase
   end
 
   context ':hsts' do
-    setup { mock_app :hsts => { :expires => '500', :subdomains => false } }
+    setup { mock_app :hsts => { :expires => '500', :subdomains => false, :preload => true } }
 
     should 'set expiry option' do
       get 'https://www.example.org/'
-      assert_equal "max-age=500", last_response.headers["Strict-Transport-Security"]
+      assert last_response.headers["Strict-Transport-Security"].include?("max-age=500")
     end
 
     should 'not include subdomains' do
       get 'https://www.example.org/'
       assert !last_response.headers["Strict-Transport-Security"].include?("includeSubDomains")
+    end
+
+    should 'set preload option' do
+      get 'https://www.example.org'
+      assert last_response.headers["Strict-Transport-Security"].include?("preload")
     end
   end
 
