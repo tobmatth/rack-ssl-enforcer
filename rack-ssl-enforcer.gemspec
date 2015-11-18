@@ -9,6 +9,7 @@ Gem::Specification.new do |s|
   s.authors     = ['Tobias Matthies', 'Thibaud Guillaume-Gentil']
   s.email       = ['tm@mit2m.d', 'thibaud@thibaud.me']
   s.homepage    = 'http://github.com/tobmatth/rack-ssl-enforcer'
+  s.licenses    = ["MIT"]
   s.summary     = 'A simple Rack middleware to enforce SSL'
   s.description = 'Rack::SslEnforcer is a simple Rack middleware to enforce ssl connections'
 
