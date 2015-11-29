@@ -162,8 +162,8 @@ The above will allow you to POST/PUT from the secure/non-secure URLs keeping the
 To set HSTS expiry and subdomain inclusion (defaults respectively to `one year` and `true`).
 
 ```ruby
-config.middleware.use Rack::SslEnforcer, :hsts => { :expires => 500, :subdomains => false }
-config.middleware.use Rack::SslEnforcer, :hsts => true # equivalent to { :expires => 31536000, :subdomains => true }
+config.middleware.use Rack::SslEnforcer, :hsts => { :expires => 500, :subdomains => false, :preload => false }
+config.middleware.use Rack::SslEnforcer, :hsts => true # equivalent to { :expires => 31536000, :subdomains => true, :preload => false }
 ```
 Please note that the strict option disables HSTS.
 
