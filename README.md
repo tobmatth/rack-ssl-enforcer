@@ -51,8 +51,10 @@ If you don't use Bundler, be sure to require Rack::SslEnforcer manually before a
 To use Rack::SslEnforcer in your Rails application, add the following line to your application config file (`config/application.rb` for Rails 3 and above, `config/environment.rb` for Rails 2):
 
 ```ruby
-config.middleware.use Rack::SslEnforcer
+config.middleware.insert_before  ActionDispatch::Cookies, Rack::SslEnforcer
 ```
+Cookies should be set before the SslEnforcer processes the headers, 
+but due to the middleware calls chain Rack::SslEnforcer should be inserted before the ActionDispatch::Cookies.
 
 If all you want is SSL for your whole application, you are done! Otherwise, you can specify some options described below.
 
