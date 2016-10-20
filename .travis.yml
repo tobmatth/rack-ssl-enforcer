@@ -10,7 +10,7 @@ rvm:
   - 2.3.1
   - ruby-head
   - ree
-  - rbx
+  - rbx-2
   - jruby
 matrix:
   allow_failures:
