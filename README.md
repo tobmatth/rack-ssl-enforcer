@@ -3,7 +3,7 @@
 Rack::SslEnforcer is a simple Rack middleware to enforce SSL connections. As of Version 0.2.0, Rack::SslEnforcer marks
 Cookies as secure by default (HSTS must be set manually).
 
-Tested against Ruby 1.8.7, 1.9.2, 1.9.3, 2.0.0, 2.1.0, ruby-head, REE and the latest versions of Rubinius & JRuby.
+Tested against Ruby 1.8.7, 1.9.2, 1.9.3, 2.0.0, 2.1.10, 2.2.5, 2.3.1, ruby-head, REE and the latest versions of Rubinius & JRuby.
 
 ## Installation
 
