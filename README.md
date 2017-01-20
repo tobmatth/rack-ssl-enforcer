@@ -1,4 +1,4 @@
-# Rack::SslEnforcer [![Build Status](https://travis-ci.org/tobmatth/rack-ssl-enforcer.png?branch=master)](https://travis-ci.org/tobmatth/rack-ssl-enforcer)
+# Rack::SslEnforcer [![Build Status](https://travis-ci.org/tobmatth/rack-ssl-enforcer.svg?branch=master)](https://travis-ci.org/tobmatth/rack-ssl-enforcer)
 
 Rack::SslEnforcer is a simple Rack middleware to enforce SSL connections. As of Version 0.2.0, Rack::SslEnforcer marks
 Cookies as secure by default (HSTS must be set manually).
