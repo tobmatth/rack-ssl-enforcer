@@ -53,7 +53,7 @@ To use Rack::SslEnforcer in your Rails application, add the following line to yo
 ```ruby
 config.middleware.insert_before  ActionDispatch::Cookies, Rack::SslEnforcer
 ```
-Cookies should be set before the SslEnforcer processes the headers, 
+Cookies should be set before the SslEnforcer processes the headers,
 but due to the middleware calls chain Rack::SslEnforcer should be inserted before the ActionDispatch::Cookies.
 
 If all you want is SSL for your whole application, you are done! Otherwise, you can specify some options described below.
@@ -272,7 +272,12 @@ Specifically, the options below account for termination of SSL at the load balan
 
 In the `location` block for your app's SSL configuration, reference the following proxy header configurations:
 
-`proxy_set_header X-Forwarded-Proto $scheme;` & `proxy_redirect off;` & `proxy_set_header Host $http_host;` & `proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;`
+```
+proxy_set_header X-Forwarded-Proto $http_x_forwarded_proto;
+proxy_set_header Host $http_host;
+proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for
+proxy_redirect off;
+```
 
 In `config/application.rb` for Rails 3 and above, `config/environment.rb` for Rails 2, work off the following line:
 
@@ -283,6 +288,11 @@ config.middleware.use Rack::SslEnforcer, ignore: lambda { |request| request.env[
 This ignores ELB healthchecks and development environment as ELB healthchecks aren't forwarded requests, so it wouldn't have the forwarded proto header.
 
 Same goes for when running without a proxy (like developemnt locally), making `:except_environments => 'development'` unecessary.
+
+In Sinatra or other non-rails ruby applications, work off the following line:
+```ruby
+use Rack::SslEnforcer, :except_environments => ['development', 'test'], :ignore => '/healthcheck'
+```
 
 ### Passenger
 
