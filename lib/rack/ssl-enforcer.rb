@@ -102,7 +102,10 @@ module Rack
       body << @options[:redirect_html] if @options[:redirect_html].is_a?(String)
       body = @options[:redirect_html] if @options[:redirect_html].respond_to?('each')
 
-      [@options[:redirect_code] || 301, { 'Content-Type' => 'text/html', 'Location' => location }, body]
+      headers = { 'Content-Type' => 'text/html', 'Location' => location }
+      set_hsts_headers!(headers) if @options[:hsts] && !@options[:strict]
+
+      [@options[:redirect_code] || 301, headers, body]
     end
 
     def ssl_request?
