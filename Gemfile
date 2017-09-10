@@ -17,7 +17,7 @@ end
 # installed on Travis CI
 #
 group :test do
-  gem 'rack-test'
+  gem 'rack-test', '< 0.7.0' if RUBY_VERSION < '2.2.2'
   gem 'test-unit', '~> 2.5' if RUBY_VERSION < '1.9.3'
   gem 'test-unit' if RUBY_VERSION >= '1.9.3'
   gem 'shoulda', '~> 2.11.3'
