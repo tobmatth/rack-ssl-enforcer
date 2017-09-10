@@ -287,7 +287,7 @@ config.middleware.use Rack::SslEnforcer, ignore: lambda { |request| request.env[
 
 This ignores ELB healthchecks and development environment as ELB healthchecks aren't forwarded requests, so it wouldn't have the forwarded proto header.
 
-Same goes for when running without a proxy (like developemnt locally), making `:except_environments => 'development'` unecessary.
+Same goes for when running without a proxy (like developemnt locally), making `:except_environments => 'development'` unnecessary.
 
 In Sinatra or other non-rails ruby applications, work off the following line:
 ```ruby
