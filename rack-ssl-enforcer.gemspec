@@ -7,7 +7,7 @@ Gem::Specification.new do |s|
   s.version     = Rack::SslEnforcer::VERSION
   s.platform    = Gem::Platform::RUBY
   s.authors     = ['Tobias Matthies', 'Thibaud Guillaume-Gentil']
-  s.email       = ['tm@mit2m.d', 'thibaud@thibaud.me']
+  s.email       = ['github@tobiasmatthies.de', 'thibaud@thibaud.me']
   s.homepage    = 'http://github.com/tobmatth/rack-ssl-enforcer'
   s.licenses    = ["MIT"]
   s.summary     = 'A simple Rack middleware to enforce SSL'
