@@ -35,20 +35,20 @@ module Rack
     end
 
     def call(env)
-      @request = Rack::Request.new(env)
+      req = Rack::Request.new(env)
 
-      return @app.call(env) if ignore?
+      return @app.call(env) if ignore?(req)
 
-      @scheme = if enforce_ssl?
+      scheme = if enforce_ssl?(req)
         'https'
-      elsif enforce_non_ssl?
+      elsif enforce_non_ssl?(req)
         'http'
       end
 
-      if redirect_required?
-        call_before_redirect
-        modify_location_and_redirect
-      elsif ssl_request?
+      if redirect_required?(req, scheme)
+        call_before_redirect(req)
+        modify_location_and_redirect(req, scheme)
+      elsif ssl_request?(req)
         status, headers, body = @app.call(env)
         flag_cookies_as_secure!(headers) if @options[:force_secure_cookies]
         set_hsts_headers!(headers) if @options[:hsts] && !@options[:strict]
@@ -60,37 +60,37 @@ module Rack
 
   private
 
-    def redirect_required?
-      scheme_mismatch? || host_mismatch?
+    def redirect_required?(req, scheme)
+      scheme_mismatch?(req, scheme) || host_mismatch?(req)
     end
 
-    def ignore?
+    def ignore?(req)
       if @options[:ignore]
         rules = [@options[:ignore]].flatten.compact
         rules.any? do |rule|
-          SslEnforcerConstraint.new(:ignore, rule, @request).matches?
+          SslEnforcerConstraint.new(:ignore, rule, req).matches?
         end
       else
         false
       end
     end
 
-    def scheme_mismatch?
-      @scheme && @scheme != current_scheme
+    def scheme_mismatch?(req, scheme)
+      scheme && scheme != current_scheme(req)
     end
 
-    def host_mismatch?
-      destination_host && destination_host != @request.host
+    def host_mismatch?(req)
+      destination_host && destination_host != req.host
     end
 
-    def call_before_redirect
-       @options[:before_redirect].call(@request) unless @options[:before_redirect].nil?
+    def call_before_redirect(req)
+       @options[:before_redirect].call(req) unless @options[:before_redirect].nil?
     end
 
-    def modify_location_and_redirect
-      location = "#{current_scheme}://#{@request.host}#{@request.fullpath}"
-      location = replace_scheme(location, @scheme)
-      location = replace_host(location, @options[:redirect_to])
+    def modify_location_and_redirect(req, scheme)
+      location = "#{current_scheme(req)}://#{req.host}#{req.fullpath}"
+      location = replace_scheme(location, req, scheme)
+      location = replace_host(location, req, @options[:redirect_to])
       redirect_to(location)
     rescue URI::InvalidURIError
       [400, { 'Content-Type' => 'text/plain'}, []]
@@ -105,8 +105,8 @@ module Rack
       [@options[:redirect_code] || 301, { 'Content-Type' => 'text/html', 'Location' => location }, body]
     end
 
-    def ssl_request?
-      current_scheme == 'https'
+    def ssl_request?(req)
+      current_scheme(req) == 'https'
     end
 
     def destination_host
@@ -117,17 +117,17 @@ module Rack
     end
 
     # Fixed in rack >= 1.3
-    def current_scheme
-      if @request.env['HTTPS'] == 'on' || @request.env['HTTP_X_SSL_REQUEST'] == 'on'
+    def current_scheme(req)
+      if req.env['HTTPS'] == 'on' || req.env['HTTP_X_SSL_REQUEST'] == 'on'
         'https'
-      elsif @request.env['HTTP_X_FORWARDED_PROTO']
-        @request.env['HTTP_X_FORWARDED_PROTO'].split(',')[0] || @request.scheme
+      elsif req.env['HTTP_X_FORWARDED_PROTO']
+        req.env['HTTP_X_FORWARDED_PROTO'].split(',')[0] || req.scheme
       else
-        @request.scheme
+        req.scheme
       end
     end
 
-    def enforce_ssl_for?(keys)
+    def enforce_ssl_for?(keys, req)
       provided_keys = keys.select { |key| @options[key] }
       if provided_keys.empty?
         true
@@ -135,24 +135,24 @@ module Rack
         provided_keys.all? do |key|
           rules = [@options[key]].flatten.compact
           rules.send([:except_hosts, :except_agents, :except_environments, :except].include?(key) ? :all? : :any?) do |rule|
-            SslEnforcerConstraint.new(key, rule, @request).matches?
+            SslEnforcerConstraint.new(key, rule, req).matches?
           end
         end
       end
     end
 
-    def enforce_non_ssl?
-      @options[:strict] || @options[:mixed] && !(@request.request_method == 'PUT' || @request.request_method == 'POST')
+    def enforce_non_ssl?(req)
+      @options[:strict] || @options[:mixed] && !(req.request_method == 'PUT' || req.request_method == 'POST')
     end
 
-    def enforce_ssl?
+    def enforce_ssl?(req)
       CONSTRAINTS_BY_TYPE.inject(true) do |memo, (type, keys)|
-        memo && enforce_ssl_for?(keys)
+        memo && enforce_ssl_for?(keys, req)
       end
     end
 
-    def replace_scheme(uri, scheme)
-      return uri if not scheme_mismatch?
+    def replace_scheme(uri, req, scheme)
+      return uri if not scheme_mismatch?(req, scheme)
 
       port = adjust_port_to(scheme)
       uri_parts = URI.split(uri)
@@ -161,8 +161,8 @@ module Rack
       URI::HTTP.new(*uri_parts).to_s
     end
 
-    def replace_host(uri, host)
-      return uri unless host_mismatch?
+    def replace_host(uri, req, host)
+      return uri unless host_mismatch?(req)
 
       host_parts = URI.split(host)
       new_host = host_parts[2] || host_parts[5]
